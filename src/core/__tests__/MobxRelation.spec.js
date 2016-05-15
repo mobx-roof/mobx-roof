@@ -47,14 +47,14 @@ describe('MobRelation', () => {
   it('undefined filter', () => {
     expect(() => relation.parsePattern('user.login | undefinedFilter')).to.throw('Undefined filter');
   });
-  it('define empty should throw error', () => {
-    expect(() => relation.define('')).to.throw(/empty/);
-    expect(() => relation.define(`
+  it('listen empty should throw error', () => {
+    expect(() => relation.listen('')).to.throw(/empty/);
+    expect(() => relation.listen(`
       # This is comment
     `)).to.throw(/empty/);
   });
-  it('define single', () => {
-    expect(relation.define(`
+  it('listen single', () => {
+    expect(relation.listen(`
       # This is comment
       user.login
     `)._relations['user.login'][0].pattern).to.eql({
@@ -65,26 +65,26 @@ describe('MobRelation', () => {
       ],
     });
   });
-  it('define more', () => {
-    expect(Object.keys(relation.define(`user.login;user.getInfo;`)._relations)).to.eql(['user.login', 'user.getInfo']);
+  it('listen more', () => {
+    expect(Object.keys(relation.listen(`user.login;user.getInfo;`)._relations)).to.eql(['user.login', 'user.getInfo']);
   });
   it('undefined action', async(done) => {
-    relation.define(`user.login->user.unKnownAction|afterFilter`, null, ({ payload }) => {
+    relation.listen(`user.login->user.unKnownAction|afterFilter`, null, ({ payload }) => {
       expect(payload.message).to.match(/not defined/);
       done();
     });
     await context.find('user').login('Lili', '123');
   });
-  it('define and exec', async(done) => {
-    relation.define(`user.login -> user.fetchUserInfo|getUsername`, ({ payload }) => {
+  it('listen and exec', async(done) => {
+    relation.listen(`user.login -> user.fetchUserInfo|getUsername`, ({ payload }) => {
       expect(payload).to.eql('Lili');
       done();
     });
     await context.find('user').login('Lili', '123');
   });
-  it('define and exec error', async(done) => {
+  it('listen and exec error', async(done) => {
     const error = new Error('define error');
-    relation.define(`user.login`, () => {
+    relation.listen(`user.login`, () => {
       return new Promise((res, rej) => {
         rej(error);
       });
@@ -94,8 +94,8 @@ describe('MobRelation', () => {
     });
     await context.find('user').login('Lili', '123');
   });
-  it('define and arrow split', async (done) => {
-    relation.define(`user.login -> user.fetchUserInfo -> getUsername`, ({ payload }) => {
+  it('listen and arrow split', async (done) => {
+    relation.listen(`user.login -> user.fetchUserInfo -> getUsername`, ({ payload }) => {
       expect(payload).to.eql(undefined);
       done();
     });
@@ -109,5 +109,20 @@ describe('MobRelation', () => {
       expect(Object.keys(context.data).length).to.eql(2);
       done();
     });
+  });
+  it('relation autorun', (done) => {
+    let times = 0;
+    relation.autorun((context) => {
+      times ++;
+      const user = context.find('user');
+      // Depend on reactive user data
+      user.toJSON();
+      if (times === 2) {
+        done();
+      }
+    });
+    setTimeout(() => {
+      context.find('user').username = 'abc';
+    }, 5);
   });
 });

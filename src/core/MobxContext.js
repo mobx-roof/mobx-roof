@@ -43,7 +43,10 @@ export default class MobxContext extends SimpleEvent {
     }
     this._addRelationMiddleware();
     // trigger relation init function in async
-    setTimeout(() => this._relation.triggerInit(this));
+    setTimeout(() => {
+      this._relation.triggerInit(this);
+      this._relation.triggerAutorun(this);
+    });
   }
   transferFromParentContext(parentContext, opts) {
     this._middleware = parentContext.middleware;

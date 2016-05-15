@@ -1,4 +1,5 @@
 import { compose } from '../common/utils';
+import { autorun } from 'mobx';
 const emptyFn = () => {};
 
 function spliter(target, keys, fn) {
@@ -22,13 +23,14 @@ function checkFilters(filters) {
   }
 }
 /**
- * todo: autorun, regexp support
+ * regexp support
  */
 export default class MobxRelation {
   constructor(filters = {}) {
     this._relations = {};
     this._filters = {};
     this._init = null;
+    this._autoruns = [];
     this.addFilters(filters);
   }
   addFilters(filters) {
@@ -42,10 +44,22 @@ export default class MobxRelation {
       throw new Error('Relation init need a function.');
     }
   }
+  autorun(autorun) {
+    if (typeof autorun === 'function') {
+      this._autoruns.push(autorun);
+    } else {
+      throw new Error('Relation autorun need a function.');
+    }
+  }
+  triggerAutorun(context) {
+    this._autoruns.forEach(fn => {
+      autorun(fn.bind(null, context));
+    });
+  }
   triggerInit(context) {
     if (this._init) this._init(context);
   }
-  define(patterns, fn, errorFn) {
+  listen(patterns, fn, errorFn) {
     if (typeof patterns === 'string') {
       patterns = patterns
         .split(/\r?\n/)
