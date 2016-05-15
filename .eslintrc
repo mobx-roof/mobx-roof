@@ -1,0 +1,31 @@
+{
+  "extends": "eslint-config-airbnb",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "mocha": true,
+    "node": true,
+    "es6": true
+  },
+  "ecmaFeatures": {
+    "generators": true,
+    "objectLiteralDuplicateProperties": true,
+    "experimentalObjectRestSpread": true
+  },
+  "rules": {
+    "strict": 0,
+    "func-names": 0,
+    "default-case": 0,
+    "no-param-reassign": 0,
+    "no-cond-assign": 0,
+    "no-shadow": 0,
+    "react/prop-types": 0,
+    "valid-jsdoc": [2, {
+      "requireReturn": false,
+      "requireParamDescription": false,
+      "requireReturnDescription": false
+    }],
+    "generator-star-spacing": [2, {"before": false, "after": true}],
+    "require-yield": 2
+  }
+}
