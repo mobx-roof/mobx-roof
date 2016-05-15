@@ -28,11 +28,22 @@ export default class MobxRelation {
   constructor(filters = {}) {
     this._relations = {};
     this._filters = {};
+    this._init = null;
     this.addFilters(filters);
   }
   addFilters(filters) {
     checkFilters(filters);
     this._filters = { ...this._filters, ...filters };
+  }
+  init(initFn) {
+    if (typeof initFn === 'function') {
+      this._init = initFn;
+    } else {
+      throw new Error('Relation init need a function.');
+    }
+  }
+  triggerInit(context) {
+    if (this._init) this._init(context);
   }
   define(patterns, fn, errorFn) {
     if (typeof patterns === 'string') {

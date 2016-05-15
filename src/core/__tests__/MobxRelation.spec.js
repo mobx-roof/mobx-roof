@@ -101,4 +101,13 @@ describe('MobRelation', () => {
     });
     await context.find('user').login('Lili', '123');
   });
+  it('relation init', (done) => {
+    expect(() => relation.init()).to.throw(/need a function/);
+    relation.init((ctx) => {
+      expect(ctx).to.eql(context);
+      // data loaded
+      expect(Object.keys(context.data).length).to.eql(2);
+      done();
+    });
+  });
 });

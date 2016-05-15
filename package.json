@@ -1,7 +1,7 @@
 {
   "name": "mobx-roof",
-  "version": "0.3.5-beta1",
-  "description": "A MVVM React Framework by mobx.",
+  "version": "0.3.5-beta2",
+  "description": "Simple React data management by mobx.",
   "main": "lib/index.js",
   "scripts": {
     "start": "webpack-dev-server",
