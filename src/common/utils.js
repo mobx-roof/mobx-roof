@@ -65,10 +65,8 @@ export function each(obj = {}, fn) {
     fn(obj[key], key);
   });
 }
-
 export const isFunction = arg => toString.call(arg) === '[object Function]';
 export const isRegExp = arg => toString.call(arg) === '[object RegExp]';
-
 export function compose(arr, arg) {
   return arr.reduce((cur, fn) => {
     return cur.then(res => fn(res));

@@ -35,7 +35,7 @@ export default class MobxContext extends SimpleEvent {
         Model.middleware = this._middleware;
         return Model;
       }
-      throw new Error(`${name} must instance of MobxModel or MobxModel class.`);
+      throw new TypeError(`${name} must instance of MobxModel or MobxModel class.`);
     });
     // transfer middleware and relation
     if (opts.parentContext) {
@@ -99,10 +99,10 @@ export default class MobxContext extends SimpleEvent {
       each(mobxModels, (MobxModel, name) => {
         if (this._data[name]) {
           if (!isMobxModelClass(MobxModel)) {
-            throw new Error(`MobxContext required MobxModel class.`);
+            throw new TypeError(`MobxContext required MobxModel class.`);
           }
           if (!(this._data[name] instanceof MobxModel)) {
-            throw new Error(`${name} is not instance of ${MobxModel._name}.`);
+            throw new TypeError(`${name} is not instance of ${MobxModel._name}.`);
           }
         } else {
           throw new Error(`Can not find data "${name}" in MobxContext.`);

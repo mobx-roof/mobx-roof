@@ -10,7 +10,7 @@ function toFilter(filter) {
   } else if (typeof filter === 'function') {
     return filter;
   }
-  throw new Error('Middleware filter must be RegExp, String or Function.');
+  throw new TypeError('Middleware filter must be RegExp, String or Function.');
 }
 
 export default class MobxMiddleware {
@@ -42,7 +42,7 @@ export default class MobxMiddleware {
       }
       return middleware;
     }
-    throw new Error('Middleware must be a function or object but get ' + middleware);
+    throw new TypeError('Middleware must be a function or object but get ' + middleware);
   }
   constructor() {
     this._before = new Middleware;

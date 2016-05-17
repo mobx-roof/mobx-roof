@@ -20,6 +20,7 @@ describe('MobxModel', () => {
     expect(user.toJSON()).to.eql(userJSON);
     expect(user.toJSON('isLogin')).to.eql(false);
     expect(user.toJSON('unknownKey')).to.eql(undefined);
+    // nested MobxModel
     const model = new MobxModel({
       users: [user, user],
       reg: /reg/,
@@ -32,6 +33,8 @@ describe('MobxModel', () => {
         },
       },
     });
+    expect(model.users[0] instanceof MobxModel).to.eql(true);
+    expect(model.nest.nest.user instanceof MobxModel).to.eql(true);
     const result = {
       users: [userJSON, userJSON],
       reg: /reg/,

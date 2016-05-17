@@ -15,11 +15,11 @@ function checkFilters(filters) {
     Object.keys(filters).forEach((key) => {
       const filter = filters[key];
       if (typeof filter !== 'function') {
-        throw new Error(`[MobxRelation] filter "${key}" must be a function`);
+        throw new TypeError(`[MobxRelation] filter "${key}" must be a function`);
       }
     });
   } else {
-    throw new Error('[MobxRelation] filters must be an Object.');
+    throw new TypeError('[MobxRelation] filters must be an Object.');
   }
 }
 /**
