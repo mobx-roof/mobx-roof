@@ -1,33 +1,60 @@
 import { expect } from 'chai';
+import MobxModel from '../MobxModel';
+import { observable } from 'mobx';
 import UserModel from '../../__tests__/helpers/UserModel';
 
 describe('MobxModel', () => {
   let user;
-  const initData = {
-    isLogin: false,
-    password: null,
-    username: 'abc',
-    userId: null,
-    userInfo: {},
-  };
+  let userJSON;
   beforeEach(() => {
+    userJSON = {
+      isLogin: false,
+      password: null,
+      username: 'abc',
+      userId: null,
+      userInfo: {},
+    };
     user = new UserModel({ username: 'abc' });
   });
   it('toJSON', () => {
-    expect(user.toJSON()).to.eql(initData);
+    expect(user.toJSON()).to.eql(userJSON);
+    expect(user.toJSON('isLogin')).to.eql(false);
+    expect(user.toJSON('unknownKey')).to.eql(undefined);
+    const model = new MobxModel({
+      users: [user, user],
+      reg: /reg/,
+      num: 1,
+      func: () => {},
+      mobxVal: observable({ observable: true }),
+      nest: {
+        nest: {
+          user,
+        },
+      },
+    });
+    const result = {
+      users: [userJSON, userJSON],
+      reg: /reg/,
+      num: 1,
+      func: undefined,
+      mobxVal: { observable: true },
+      nest: { nest: { user: userJSON } },
+    };
+    expect(model.toJSON()).to.eql(result);
+    expect(model.toJSON('users')).to.eql([userJSON, userJSON]);
   });
   it('stringify', () => {
-    expect(user.stringify()).to.eql(JSON.stringify(initData));
+    expect(user.stringify()).to.eql(JSON.stringify(userJSON));
   });
   it('map', () => {
     const keys = [];
     user.each((item, key) => {
       keys.push(key);
     });
-    expect(keys).to.eql(Object.keys(initData));
+    expect(keys).to.eql(Object.keys(userJSON));
   });
   it('dataKeys', () => {
-    expect(user.dataKeys).to.eql(Object.keys(initData));
+    expect(user.dataKeys).to.eql(Object.keys(userJSON));
   });
   it('getID', () => {
     const user1 = new UserModel;

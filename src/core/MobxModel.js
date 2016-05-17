@@ -1,5 +1,5 @@
 import { extendObservable, toJSON, autorun } from 'mobx';
-import { mapValues, each } from '../common/utils';
+import { mapValues, each, isRegExp } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
 
@@ -40,9 +40,23 @@ export default class MobxModel {
     return this._actionStates[actionName];
   }
   toJSON(key) {
-    if (key) return toJSON(this[key]);
+    function parse(val) {
+      if (val instanceof MobxModel) {
+        return val.toJSON();
+      }
+      val = toJSON(val);
+      if (Array.isArray(val)) {
+        return val.map(item => parse(item));
+      } else if (isRegExp(val)) {
+        return val;
+      } else if (val && typeof val === 'object') {
+        return mapValues(val, (item) => parse(item));
+      }
+      return val;
+    }
+    if (key) return parse(this[key]);
     return this._dataKeys.reduce((json, key) => {
-      json[key] = toJSON(this[key]);
+      json[key] = parse(this[key]);
       return json;
     }, {});
   }
