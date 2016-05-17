@@ -4,10 +4,10 @@ let uuid = 0;
 export default function createModel({ name, data = {}, actions = {}, autorun = {} }, Parent = _MobxModel) {
   const mobxActions = toMobxActions(actions);
   if (!isMobxModelClass(Parent)) {
-    throw new Error('Parent class must extend From MobxModel.');
+    throw new Error('[createModel] Parent class must extend From MobxModel.');
   }
   if (!name) {
-    throw new Error('createModel need a name.');
+    throw new Error('[createModel] need a name.');
   }
   class MobxModel extends Parent {
     static uuid = ++ uuid

@@ -23,7 +23,7 @@ export default class MobxContext extends SimpleEvent {
         if (opts.parentContext) {
           return opts.parentContext.find(Model);
         }
-        throw new Error(`Context initData "${Model}" can not find in it's parentContext.`);
+        throw new Error(`[@context] InitData "${Model}" can not find in it's parentContext.`);
       }
       // Get a class
       if (isMobxModelClass(Model)) {
@@ -35,7 +35,7 @@ export default class MobxContext extends SimpleEvent {
         Model.middleware = this._middleware;
         return Model;
       }
-      throw new TypeError(`${name} must instance of MobxModel or MobxModel class.`);
+      throw new TypeError(`[@context] ${name} must instance of MobxModel or MobxModel class.`);
     });
     // transfer middleware and relation
     if (opts.parentContext) {
@@ -92,33 +92,33 @@ export default class MobxContext extends SimpleEvent {
     if (Array.isArray(mobxModels)) {
       mobxModels.forEach((name) => {
         if (!this._data[name]) {
-          throw new Error(`Can not find data "${name}" in MobxContext.`);
+          throw new Error(`[@observer] Can not find data "${name}" in MobxContext.`);
         }
       });
     } else {
       each(mobxModels, (MobxModel, name) => {
         if (this._data[name]) {
           if (!isMobxModelClass(MobxModel)) {
-            throw new TypeError(`MobxContext required MobxModel class.`);
+            throw new TypeError(`[@observer] MobxContext required MobxModel class.`);
           }
           if (!(this._data[name] instanceof MobxModel)) {
-            throw new TypeError(`${name} is not instance of ${MobxModel.name}.`);
+            throw new TypeError(`[@observer] ${name} is not instance of ${MobxModel.name}.`);
           }
         } else {
-          throw new Error(`Can not find data "${name}" in MobxContext.`);
+          throw new Error(`[@observer] Can not find data "${name}" in MobxContext.`);
         }
       });
     }
   }
   pick(...keys) {
     return keys.reduce((obj, key) => {
-      if (!this._data[key]) throw new Error(`Can not find data "${key}" in MobxContext.`);
+      if (!this._data[key]) throw new Error(`[MobxContext] Can not find data "${key}" in MobxContext.`);
       obj[key] = this._data[key];
       return obj;
     }, { });
   }
   find(key) {
-    if (!this._data[key]) throw new Error(`Can not find data "${key}" in MobxContext.`);
+    if (!this._data[key]) throw new Error(`[MobxContext] Can not find data "${key}" in MobxContext.`);
     return this._data[key];
   }
   _findKeyByModel(model) {

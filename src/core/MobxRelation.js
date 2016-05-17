@@ -41,14 +41,14 @@ export default class MobxRelation {
     if (typeof initFn === 'function') {
       this._init = initFn;
     } else {
-      throw new Error('Relation init need a function.');
+      throw new Error('[MobxRelation] Relation init need a function.');
     }
   }
   autorun(autorun) {
     if (typeof autorun === 'function') {
       this._autoruns.push(autorun);
     } else {
-      throw new Error('Relation autorun need a function.');
+      throw new Error('[MobxRelation] Relation autorun need a function.');
     }
   }
   triggerAutorun(context) {
@@ -69,7 +69,7 @@ export default class MobxRelation {
         .split(';')
         .filter(item => item);
       if (patterns.length === 0) {
-        throw new Error('Relation pattern can not be empty.');
+        throw new Error('[MobxRelation] Relation pattern can not be empty.');
       }
       patterns.forEach(pattern => this._addRelation(pattern, fn, errorFn));
     } else {
@@ -116,10 +116,10 @@ export default class MobxRelation {
   parsePattern(pattern) {
     pattern = pattern.replace(/\s*/g, '');
     if (!pattern) {
-      throw new Error(`Relation pattern can not be empty.`);
+      throw new Error(`[MobxRelation] Relation pattern can not be empty.`);
     }
     if (!/^[\*\->\.a-zA-Z_\|]+$/.test(pattern)) {
-      throw new Error(`Relation pattern "${pattern}" illegal.`);
+      throw new Error(`[MobxRelation] Relation pattern "${pattern}" illegal.`);
     }
     const refs = [];
     const chain = spliter(pattern, ['->', '|'], (key) => {
@@ -127,13 +127,13 @@ export default class MobxRelation {
         const modelName = key.split('.')[0];
         if (!refs.includes(modelName)) refs.push(modelName);
       } else if (key && !this._filters[key]) {
-        throw new Error(`Undefined filter "${key}"`);
+        throw new Error(`[MobxRelation] Undefined filter "${key}"`);
       }
       return key;
     }).filter(item => item.length !== 0);
     const action = chain[0][0];
     if (!action || !isActionKey(action)) {
-      throw new Error('Relation pattern need an dispatcher action.');
+      throw new Error('[MobxRelation] Relation pattern need an dispatcher action.');
     }
     chain[0] = chain[0].slice(1);
     return {

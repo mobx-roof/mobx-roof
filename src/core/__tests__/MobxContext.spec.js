@@ -31,6 +31,6 @@ describe('MobContext', () => {
     const childContext = new MobxContext({ myUser: 'user' }, { parentContext: context });
     expect(childContext.middleware).to.eql(context.middleware);
     expect(childContext.find('myUser')).to.eql(context.find('user'));
-    expect(() => new MobxContext({ user: 'unKnown' })).to.throw(/initData "unKnown"/);
+    expect(() => new MobxContext({ user: 'unKnown' })).to.throw(/InitData "unKnown"/);
   });
 });

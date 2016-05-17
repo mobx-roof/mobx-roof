@@ -1,6 +1,6 @@
 {
   "name": "mobx-roof",
-  "version": "0.3.5-beta4",
+  "version": "0.3.5-beta5",
   "description": "Simple React data management by mobx.",
   "main": "lib/index.js",
   "scripts": {
@@ -52,6 +52,7 @@
     "mocha": "^2.4.5",
     "pre-commit": "^1.1.2",
     "react": "^15.0.2",
+    "react-addons-test-utils": "^15.0.2",
     "react-dom": "^15.0.2",
     "source-map-support": "^0.4.0",
     "style-loader": "^0.13.1",

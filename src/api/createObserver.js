@@ -22,7 +22,7 @@ export default function createObserver(mobxModels = {}) {
       constructor() {
         super(...arguments);
         if (!this.getMobxContext()) {
-          throw new Error('Please Add decorator "@Context()" in your Root Component.');
+          throw new Error('[@Observer] Please Add decorator "@Context(...)" in your Root Component.');
         }
         this.getMobxContext().checkMobxModels(mobxModels);
       }
@@ -30,13 +30,13 @@ export default function createObserver(mobxModels = {}) {
         return this.context[CONTEXT_NAME];
       }
       render() {
-        const contextProps = this.getMobxContext().pick(...modelKeys);
         return (
-          <ObserverComponent {...contextProps} {...this.props} />
+          <ObserverComponent {...this.props} />
         );
       }
     }
-    addMobxContextToComponent(ObserverContainer);
+    addMobxContextToComponent(ObserverContainer, [CONTEXT_NAME]);
+    addMobxContextToComponent(ObserverComponent, modelKeys);
     return ObserverContainer;
   };
 }

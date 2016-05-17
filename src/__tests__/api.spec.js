@@ -1,6 +1,16 @@
 import { createModel, extendModel } from '../index';
 import { expect } from 'chai';
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+import ContextComponent from './helpers/ContextComponent';
 import { autorun, isObservable } from 'mobx';
+
+function renderContext(props = {}) {
+  const renderer = TestUtils.createRenderer();
+  renderer.render(<ContextComponent {...props} />);
+  return renderer.getRenderOutput();
+}
+
 const use = () => {};
 describe('mobx-roof', () => {
   const User = createModel({
@@ -18,6 +28,9 @@ describe('mobx-roof', () => {
         this.name = name;
       },
     },
+  });
+  beforeEach(() => {
+
   });
   it('api.createModel', async () => {
     const user = new User;
@@ -67,5 +80,9 @@ describe('mobx-roof', () => {
     });
     user.chinese.zodiac = 'snake';
     expect(times).to.eql(2);
+  });
+  it('api.createContext', () => {
+    const output = renderContext();
+    expect(Object.keys(output.type.contextTypes)).to.eql(['user', 'todo']);
   });
 });

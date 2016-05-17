@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { CONTEXT_NAME } from '../common/constants';
 import { observer as originObserver } from 'mobx-react';
-import { addMobxContextToComponent } from '../common/utils';
+import { addMobxContextToComponent, getContextTypes } from '../common/utils';
 import MobxContext from '../core/MobxContext';
 
 /**
@@ -13,12 +13,14 @@ import MobxContext from '../core/MobxContext';
  * @return {Function}
  */
 export default function createContext(contextInitData, opts = {}) {
+  const keys = Object.keys(contextInitData);
   return function (WrappedComponent) {
     const ObserverComponent = originObserver(WrappedComponent);
-    addMobxContextToComponent(ObserverComponent);
+    addMobxContextToComponent(ObserverComponent, Object.keys(contextInitData));
     class ContextContainer extends Component {
       static childContextTypes = {
         [CONTEXT_NAME]: PropTypes.object.isRequired,
+        ...getContextTypes(keys),
       }
       constructor() {
         super(...arguments);
@@ -32,6 +34,7 @@ export default function createContext(contextInitData, opts = {}) {
       getChildContext() {
         return {
           [CONTEXT_NAME]: this[CONTEXT_NAME],
+          ...this[CONTEXT_NAME].data,
         };
       }
       componentWillUnmount() {
@@ -41,7 +44,7 @@ export default function createContext(contextInitData, opts = {}) {
         return this.context[CONTEXT_NAME];
       }
       render() {
-        return <ObserverComponent {...this[CONTEXT_NAME].data} {...this.props} />;
+        return <ObserverComponent {...this.props} />;
       }
     }
     return ContextContainer;

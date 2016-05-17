@@ -51,15 +51,24 @@ export function toObservableObj(obj) {
     return typeof val === 'object' ? toObservableObj(val) : val;
   }));
 }
+export function getContextTypes(keys) {
+  return keys.reduce((obj, key) => {
+    obj[key] = PropTypes.object.isRequired;
+    return obj;
+  }, {});
+}
+
 /**
  * @param {React.Component} WrappedComponent
+ * @param {Array} keys
  */
-export function addMobxContextToComponent(WrappedComponent) {
+export function addMobxContextToComponent(WrappedComponent, keys = []) {
   WrappedComponent.contextTypes = {
-    [CONTEXT_NAME]: PropTypes.object.isRequired,
+    ...getContextTypes(keys),
     ...WrappedComponent.contextTypes,
   };
 }
+
 export function each(obj = {}, fn) {
   Object.keys(obj).forEach((key) => {
     fn(obj[key], key);

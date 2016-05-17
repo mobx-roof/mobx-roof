@@ -1,1 +1,1 @@
-export const CONTEXT_NAME = 'mobxContext';
+export const CONTEXT_NAME = '__mobxContext__';

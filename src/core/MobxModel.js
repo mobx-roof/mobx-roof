@@ -10,7 +10,7 @@ export default class MobxModel {
       this.constructor !== MobxModel &&
       this.constructor.uuid === Object.getPrototypeOf(this.constructor).uuid
     ) {
-      throw new Error('Can not immediately extend from MobxModel.');
+      throw new Error('[MobxModel] Can not immediately extend from MobxModel.');
     }
     this._actionStates = {};
     this._middleware = middleware || new MobxMiddleware;
@@ -32,7 +32,7 @@ export default class MobxModel {
     this._middleware = middleware;
   }
   getActionState(actionName) {
-    if (!this[actionName]) throw new Error('Undefined action: ', actionName);
+    if (!this[actionName]) throw new Error('[MobxModel] Undefined action: ', actionName);
     if (!this._actionStates[actionName]) {
       extendObservable(this._actionStates, { [actionName]: { loading: false, error: null } });
     }
@@ -73,7 +73,7 @@ export default class MobxModel {
   _checkDataKeys() {
     this._dataKeys.forEach((dataKey) => {
       if (this[dataKey]) {
-        throw new Error(`Data key "${dataKey}" is defined in action.`);
+        throw new Error(`[MobxModel] Data key "${dataKey}" is defined in action.`);
       }
     });
   }

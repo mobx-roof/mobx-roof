@@ -10,7 +10,7 @@ function toFilter(filter) {
   } else if (typeof filter === 'function') {
     return filter;
   }
-  throw new TypeError('Middleware filter must be RegExp, String or Function.');
+  throw new TypeError('[MobxMiddleware] Middleware filter must be RegExp, String or Function.');
 }
 
 export default class MobxMiddleware {
@@ -23,7 +23,7 @@ export default class MobxMiddleware {
       middleware = { ...middleware };
       Object.keys(middleware).forEach(key => {
         if (!KEYS.includes(key)) {
-          throw new Error(`Middleware key must one of "${KEYS.join(' ,')}"`);
+          throw new Error(`[MobxMiddleware] Middleware key must one of "${KEYS.join(' ,')}"`);
         }
       });
       if (middleware.filter) {
@@ -42,7 +42,7 @@ export default class MobxMiddleware {
       }
       return middleware;
     }
-    throw new TypeError('Middleware must be a function or object but get ' + middleware);
+    throw new TypeError('[MobxMiddleware] Middleware must be a function or object but get ' + middleware);
   }
   constructor() {
     this._before = new Middleware;
