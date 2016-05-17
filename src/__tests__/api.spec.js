@@ -69,17 +69,52 @@ describe('mobx-roof', () => {
         chinese: {
           zodiac: 'dragon',
         },
+        info: 'from china',
+      },
+      actions: {
+        rename() {},
       },
     });
     expect(ChineseUser.uuid).to.not.eql(User.uuid);
-    const user = new ChineseUser;
-    let times = 0;
-    autorun(() => {
-      times ++;
-      use(user.chinese.zodiac);
+    const user = new ChineseUser({ name: 'Jim' });
+    expect(user.toJSON()).to.eql({
+      name: 'Jim',
+      info: 'from china',
+      friends: [],
+      chinese: {
+        zodiac: 'dragon',
+      },
     });
-    user.chinese.zodiac = 'snake';
-    expect(times).to.eql(2);
+    expect(user.rename).to.instanceOf(Function);
+  });
+  it('api.extendModel by data function', () => {
+    let count = 0;
+    const Panel = createModel({
+      name: 'Panel',
+      data(initData) {
+        return {
+          tabName: '',
+          id: count++,
+          ...initData,
+        };
+      },
+    });
+    const PagePanel = extendModel(Panel, {
+      name: 'PagePanel',
+      data(initData) {
+        return {
+          tabName: 'page',
+          content: 'abc',
+          ...initData,
+        };
+      },
+    });
+    const panel = new PagePanel;
+    expect(panel.toJSON()).to.eql({
+      tabName: 'page',
+      content: 'abc',
+      id: 0,
+    });
   });
   it('api.createContext', () => {
     const output = renderContext();
