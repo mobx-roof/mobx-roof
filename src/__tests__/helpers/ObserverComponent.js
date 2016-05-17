@@ -3,10 +3,9 @@ import createObserver from '../../api/createObserver';
 import TodoModel from './TodoModel';
 import UserModel from './UserModel';
 
-@createObserver(['user', 'todo'])
+@createObserver({ user: UserModel, todo: TodoModel })
 export default class ObserverComponent extends Component {
   render() {
-    console.log('gaga')
     return (
       <div>
       </div>

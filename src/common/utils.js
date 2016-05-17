@@ -1,6 +1,5 @@
 const toString = Object.prototype.toString;
 import { isObservable, observable } from 'mobx';
-import { CONTEXT_NAME } from './constants';
 import { PropTypes } from 'react';
 /**
  * @param {Object} target
