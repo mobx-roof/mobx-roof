@@ -11,7 +11,6 @@ function renderContext(props = {}) {
   return renderer.getRenderOutput();
 }
 
-const use = () => {};
 describe('mobx-roof', () => {
   const User = createModel({
     name: 'User',
