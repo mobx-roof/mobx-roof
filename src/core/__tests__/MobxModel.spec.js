@@ -40,4 +40,17 @@ describe('MobxModel', () => {
       return new ChineseUser;
     }).to.throw(/immediately extend/);
   });
+  it('model autorun', (done) => {
+    let times = 0;
+    const model = new UserModel({}, null, {
+      autoLoad() {
+        times ++;
+        if (times === 2) {
+          done();
+        }
+        return this.username;
+      },
+    });
+    model.username = 'newUsername';
+  });
 });

@@ -1,24 +1,27 @@
-import { extendObservable, toJSON } from 'mobx';
-import { mapValues } from '../common/utils';
+import { extendObservable, toJSON, autorun } from 'mobx';
+import { mapValues, each } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
 
 export default class MobxModel {
   static uuid = 0
   static _name = 'MobxModel'
-  constructor(initData = {}, middleware) {
-    this._actionStates = {};
-    this._middleware = middleware || new MobxMiddleware;
-    this._id = count ++;
-    this._dataKeys = Object.keys(initData);
-    this._checkDataKeys();
-    extendObservable(this, { ...initData });
+  constructor(initData = {}, middleware, autorunMap = {}) {
     if (
       this.constructor !== MobxModel &&
       this.constructor.uuid === Object.getPrototypeOf(this.constructor).uuid
     ) {
       throw new Error('Can not immediately extend from MobxModel.');
     }
+    this._actionStates = {};
+    this._middleware = middleware || new MobxMiddleware;
+    this._id = count ++;
+    this._dataKeys = Object.keys(initData);
+    this._checkDataKeys();
+    extendObservable(this, { ...initData });
+    each(autorunMap, (autorunFn) => {
+      autorun(autorunFn, this);
+    });
   }
   getID() {
     return this._id;
