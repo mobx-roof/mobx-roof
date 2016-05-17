@@ -5,7 +5,6 @@ let count = 0;
 
 export default class MobxModel {
   static uuid = 0
-  static _name = 'MobxModel'
   constructor(initData = {}, middleware, autorunMap = {}) {
     if (
       this.constructor !== MobxModel &&
@@ -69,7 +68,7 @@ export default class MobxModel {
     });
   }
   toString() {
-    return this.constructor._name;
+    return this.constructor.name;
   }
   _checkDataKeys() {
     this._dataKeys.forEach((dataKey) => {

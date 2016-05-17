@@ -11,7 +11,6 @@ export default function createModel({ name, data = {}, actions = {}, autorun = {
   }
   class MobxModel extends Parent {
     static uuid = ++ uuid
-    static _name = name
     constructor(_initData = {}, middleware, _autorun = {}) {
       if (typeof data === 'function') {
         data = data(_initData);
@@ -21,6 +20,15 @@ export default function createModel({ name, data = {}, actions = {}, autorun = {
       }
     }
   }
+  // Define MobxModel name
+  Object.defineProperties(MobxModel, {
+    name: {
+      enumerable: false,
+      configurable: true,
+      writable: false,
+      value: name,
+    },
+  });
   MobxModel.prototype = Object.assign(MobxModel.prototype, mobxActions);
   return MobxModel;
 }

@@ -102,7 +102,7 @@ export default class MobxContext extends SimpleEvent {
             throw new TypeError(`MobxContext required MobxModel class.`);
           }
           if (!(this._data[name] instanceof MobxModel)) {
-            throw new TypeError(`${name} is not instance of ${MobxModel._name}.`);
+            throw new TypeError(`${name} is not instance of ${MobxModel.name}.`);
           }
         } else {
           throw new Error(`Can not find data "${name}" in MobxContext.`);
