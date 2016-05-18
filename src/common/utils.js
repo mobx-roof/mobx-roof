@@ -1,5 +1,6 @@
 const toString = Object.prototype.toString;
 import { isObservable, observable } from 'mobx';
+import { CONTEXT_NAME } from './constants';
 import { PropTypes } from 'react';
 /**
  * @param {Object} target
@@ -50,24 +51,15 @@ export function toObservableObj(obj) {
     return typeof val === 'object' ? toObservableObj(val) : val;
   }));
 }
-export function getContextTypes(keys) {
-  return keys.reduce((obj, key) => {
-    obj[key] = PropTypes.object.isRequired;
-    return obj;
-  }, {});
-}
-
 /**
  * @param {React.Component} WrappedComponent
- * @param {Array} keys
  */
-export function addMobxContextToComponent(WrappedComponent, keys = []) {
+export function addMobxContextToComponent(WrappedComponent) {
   WrappedComponent.contextTypes = {
-    ...getContextTypes(keys),
+    [CONTEXT_NAME]: PropTypes.object.isRequired,
     ...WrappedComponent.contextTypes,
   };
 }
-
 export function each(obj = {}, fn) {
   Object.keys(obj).forEach((key) => {
     fn(obj[key], key);

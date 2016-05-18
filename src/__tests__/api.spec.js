@@ -117,6 +117,6 @@ describe('mobx-roof', () => {
   });
   it('api.createContext', () => {
     const output = renderContext();
-    expect(Object.keys(output.type.contextTypes)).to.eql(['user', 'todo']);
+    expect(Object.keys(output.props)).to.eql(['user', 'todo']);
   });
 });

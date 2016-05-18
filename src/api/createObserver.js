@@ -30,13 +30,13 @@ export default function createObserver(mobxModels = {}) {
         return this.context[CONTEXT_NAME];
       }
       render() {
+        const contextProps = this.getMobxContext().pick(...modelKeys);
         return (
-          <ObserverComponent {...this.props} />
+          <ObserverComponent {...contextProps} {...this.props} />
         );
       }
     }
-    addMobxContextToComponent(ObserverContainer, [CONTEXT_NAME]);
-    addMobxContextToComponent(ObserverComponent, modelKeys);
+    addMobxContextToComponent(ObserverContainer);
     return ObserverContainer;
   };
 }
