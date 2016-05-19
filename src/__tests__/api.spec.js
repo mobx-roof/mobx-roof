@@ -44,7 +44,7 @@ describe('mobx-roof', () => {
     let times = 0;
     autorun(() => {
       times++;
-      return user.friends.join('') + ' and ' + user.name + ' are in ' + user.info.address + user.info.habits.join(',');
+      user.toJSON();
     });
     await user.changeName('me');
     user.friends.push('Jack');
@@ -53,6 +53,8 @@ describe('mobx-roof', () => {
     expect(times).to.eql(4);
     user.info.habits.push('swim');
     expect(times).to.eql(4);
+    user.info = { habits: [] };
+    expect(isObservable(user.info.habits)).to.eql(false);
   });
   it('api.createModel with action defined', () => {
     const User = createModel({

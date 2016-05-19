@@ -1,4 +1,4 @@
-import { extendObservable, toJSON, autorun } from 'mobx';
+import { extendObservable, toJSON, autorun, transaction } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
@@ -89,6 +89,16 @@ export default class MobxModel {
         throw new Error(`[MobxModel] Data key "${dataKey}" is defined in actions.`);
       }
     });
+  }
+  set(key, val) {
+    if (typeof key === 'string') {
+      this[key] = val;
+      return this;
+    }
+    transaction(() => {
+      mapValues(key, item => item, this);
+    });
+    return this;
   }
 }
 

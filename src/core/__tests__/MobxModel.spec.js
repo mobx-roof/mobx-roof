@@ -75,12 +75,30 @@ describe('MobxModel', () => {
     const model = new UserModel({}, null, {
       autoLoad() {
         times ++;
+        this.toJSON();
+        expect(times).to.lessThan(3);
         if (times === 2) {
           done();
         }
-        return this.username;
       },
     });
     model.username = 'newUsername';
+  });
+  it('model set', (done) => {
+    let times = 0;
+    const model = new UserModel({}, null, {
+      autoLoad() {
+        times ++;
+        this.toJSON();
+        expect(times).to.lessThan(3);
+        if (times === 2) done();
+      },
+    });
+    model.set({
+      username: 'username',
+      password: 'password',
+      undefine: 'undefined',
+    });
+    model.set('username', 'username');
   });
 });
