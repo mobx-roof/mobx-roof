@@ -18,6 +18,8 @@ export default function createObserver(mobxModels = {}) {
   }
   return function (WrappedComponent) {
     const ObserverComponent = originObserver(WrappedComponent);
+    // If empty, use mobx @observer
+    if (modelKeys.length === 0) return ObserverComponent;
     class ObserverContainer extends Component {
       constructor() {
         super(...arguments);
