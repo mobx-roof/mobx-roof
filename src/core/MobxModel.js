@@ -5,7 +5,7 @@ let count = 0;
 
 export default class MobxModel {
   static uuid = 0
-  constructor(initData = {}, middleware, autorunMap = {}) {
+  constructor(initData = {}, middleware, autorunMap = {}, constants = {}) {
     if (
       this.constructor !== MobxModel &&
       this.constructor.uuid === Object.getPrototypeOf(this.constructor).uuid
@@ -15,9 +15,22 @@ export default class MobxModel {
     this._actionStates = {};
     this._middleware = middleware || new MobxMiddleware;
     this._id = count ++;
-    this._dataKeys = Object.keys(initData);
+    // check keys
+    this._dataKeys = Object.keys(initData).concat(Object.keys(constants));
     this._checkDataKeys();
+    // add constants
+    const _constants = mapValues(constants, (value) => {
+      return {
+        enumerable: true,
+        configurable: true,
+        writable: false,
+        value,
+      };
+    });
+    // add observable keys
+    Object.defineProperties(this, _constants);
     extendObservable(this, toObservableObj(initData));
+    // add auto run key
     each(autorunMap, (autorunFn) => {
       autorun(autorunFn, this);
     });
@@ -73,7 +86,7 @@ export default class MobxModel {
   _checkDataKeys() {
     this._dataKeys.forEach((dataKey) => {
       if (this[dataKey]) {
-        throw new Error(`[MobxModel] Data key "${dataKey}" is defined in action.`);
+        throw new Error(`[MobxModel] Data key "${dataKey}" is defined in actions.`);
       }
     });
   }

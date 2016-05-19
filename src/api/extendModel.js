@@ -1,4 +1,4 @@
 import createModel from './createModel';
-export default function extendModel(parentModel, { name, data = {}, actions = {} }) {
-  return createModel({ name: name || parentModel.name, data, actions }, parentModel);
+export default function extendModel(parentModel, { name, constants, data = {}, actions = {} }) {
+  return createModel({ name: name || parentModel.name, constants, data, actions }, parentModel);
 }

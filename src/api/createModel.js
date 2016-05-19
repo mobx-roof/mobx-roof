@@ -1,7 +1,7 @@
 import _MobxModel, { toMobxActions, isMobxModelClass } from '../core/MobxModel';
 let uuid = 0;
 
-export default function createModel({ name, data = {}, actions = {}, autorun = {} }, Parent = _MobxModel) {
+export default function createModel({ name, data = {}, constants = {}, actions = {}, autorun = {} }, Parent = _MobxModel) {
   const mobxActions = toMobxActions(actions);
   if (!isMobxModelClass(Parent)) {
     throw new Error('[createModel] Parent class must extend From MobxModel.');
@@ -11,13 +11,9 @@ export default function createModel({ name, data = {}, actions = {}, autorun = {
   }
   class MobxModel extends Parent {
     static uuid = ++ uuid
-    constructor(_initData = {}, middleware, _autorun = {}) {
-      if (typeof data === 'function') {
-        data = data(_initData);
-        super(data, middleware, { ...autorun, ..._autorun });
-      } else {
-        super({ ...data, ..._initData }, middleware, { ...autorun, ..._autorun });
-      }
+    constructor(_initData = {}, middleware, _autorun = {}, _constants) {
+      const _data = typeof data === 'function' ? data(_initData) : { ...data, ..._initData };
+      super(_data, middleware, { ...autorun, ..._autorun }, { ...constants, ..._constants });
     }
   }
   // Define MobxModel name

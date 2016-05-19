@@ -122,6 +122,27 @@ describe('mobx-roof', () => {
       id: 0,
     });
   });
+  it('api.createModel constants', () => {
+    const struct = {
+      name: 'user',
+      constants: {
+        from: 'China',
+      },
+    };
+    const UserModel = createModel(struct);
+    const User2Model = createModel({
+      ...struct,
+      actions: {
+        from() {},
+      },
+    });
+    const user = new UserModel;
+    expect(user.from).to.eql('China');
+    expect(user.toJSON()).to.eql({ from: 'China' });
+    expect(() => user.from = 'USA').to.throw(/read only/);
+    expect(() => new UserModel({ from: 'USA' })).to.throw(/not configurable/);
+    expect(() => new User2Model()).to.throw(/defined in actions/);
+  });
   it('api.createContext', () => {
     const output = renderContext();
     expect(Object.keys(output.props)).to.eql(['user', 'todo']);
