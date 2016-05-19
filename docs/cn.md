@@ -1,16 +1,16 @@
 # Mobx-Roof
 
-Mobx-roof is a simple React MVVM framework based on [mobx](https://github.com/mobxjs/mobx).
+Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单mvvm框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展
 
-### Guide
+## 指引
 
-You can see this example in the `example` folder.
+下边的例子可以在项目`example`中找到
 
-### Base
+### 基础篇
 
-- 1.Create Model
+- 1.创建模型
 
-Create a user login model first:
+我们先创建一个用户登录模型:
 
 ```javascript
 import { createModel } from 'mobx-roof';
@@ -32,7 +32,7 @@ export default createModel({
     async login(username, password) {
       const res = await api.login(username, password);
       if (res.success) {
-        // "set" can set more values and just trigger data changed once.
+        // 使用set可以设定多个值, 并只触发一次数据变动事件
         this.set({
           userId: res.id,
           username,
@@ -41,7 +41,7 @@ export default createModel({
           loginError: null,
         });
       } else {
-        // This can trigger data changed.
+        // 直接赋值会触发一次数据变动事件
         this.loginError = res.message;
       }
     },
@@ -50,9 +50,9 @@ export default createModel({
 
 ```
 
-- 2.Bind to react component
+- 2.绑定到react组件
 
-use `@context` can create a isolate data space.
+通过@context创建一个隔离的数据空间, 并把数据绑定对应的组件上
 
 ```javascript
 import React, { Component, PropTypes } from 'react';
@@ -90,7 +90,9 @@ export default class App extends Component {
 }
 
 ```
-- 3.Get action state
+- 3.获取action状态
+
+通过`getActionState`可以获取任意的action执行状态, 当action开始执行时候状态`loading`为true, 如果执行失败错误信息会放到`error`中
 
 ```javascript
 @context({ user: UserModel })
@@ -127,9 +129,9 @@ export default class App extends Component {
   }
 }
 ```
-- 4.Split the react component by `@observer`
+- 4.拆分react组件, 实现组件间数据共享
 
-`@observer` can subsribe data from the parent context.
+`@observer` 可以订阅父节点context中的数据
 
 ```javascript
 // example/App
@@ -164,7 +166,7 @@ class UserLogin extends Component {
   }
 }
 
-// It should throw Error if user is not instance of UserModel
+// 这里如果user字段从context获取的类型不是UserModel则会报错
 @observer({ user: UserModel })
 class UserDetail extends Component {
   static propTypes = {
@@ -199,8 +201,9 @@ export default class App extends Component {
 
 ```
 
-- 5.Autorun
+- 5.autorun 实现数据自动保存
 
+下边例子当UserModel数据发生变化时候会自动保存到localStorage
 
 ```javascript
 import { createModel } from '../../src';
@@ -210,7 +213,7 @@ const STORE_KEY = 'mobx-roof';
 export default createModel({
   name: 'User',
   data() {
-    // Init data from localStorage
+    // 从localStorage初始化数据
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
     return {
@@ -247,7 +250,7 @@ export default createModel({
     },
   },
   autorun: {
-    // Auto save data to localStorage, `toJSON` can trigger this function always if any data changed.
+    // 自动保存到localStorage, 这里通过`toJSON`会让该方法监听所有的数据变化
     saveToLocalStorage() {
       localStorage.setItem(STORE_KEY, JSON.stringify(this.toJSON()));
     },
@@ -256,12 +259,17 @@ export default createModel({
 
 ```
 
+- 最终效果:
+
 ![image](https://os.alipayobjects.com/rmsportal/ocoJUnwRTPpvoUv.gif)
 
-### Other docs
+### 高级篇
 
-- [中文文档](docs/cn.md)
+- 1.中间件
 
-### More examples
+下边创建了一个简单的pending中间件, 当action执行
 
-[mobx-roof-boilerplate](https://github.com/mobx-roof/mobx-roof-boilerplate)
+
+- 2.数据关联
+- 3.数据模型的继承
+- 4.数据模型的嵌套

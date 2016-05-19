@@ -10,6 +10,11 @@ function renderContext(props = {}) {
   return renderer.getRenderOutput();
 }
 describe('mobx-roof', () => {
+  const actions = {
+    changeName(name) {
+      this.name = name;
+    },
+  };
   const User = createModel({
     name: 'User',
     data: {
@@ -25,14 +30,11 @@ describe('mobx-roof', () => {
         name: 'Jack',
       }],
     },
-    actions: {
-      changeName(name) {
-        this.name = name;
-      },
-    },
+    actions,
   });
   it('api.createModel', async() => {
     const user = new User;
+    expect(User.actions).to.eql(actions);
     expect(isObservable(user)).to.eql(true);
     expect(isObservable(user.info)).to.eql(true);
     expect(isObservable(user.friends)).to.eql(true);

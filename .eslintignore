@@ -1,7 +1,6 @@
 app/proxy*
 node_modules/
 test/fixtures
-example/
 fntest/
 dist/
 lib/
