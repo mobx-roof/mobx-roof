@@ -12,7 +12,7 @@ Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单Reac MVVM框架
 
 ### 1.创建模型
 
-我们先创建一个用户登录模型.
+我们先通过`createModel`创建一个用户登录数据模型.
 
 ```javascript
 import { createModel } from 'mobx-roof';
@@ -54,7 +54,7 @@ export default createModel({
 
 ### 2.绑定到react组件
 
-通过@context创建一个隔离的数据空间, 并把数据绑定对应的组件上.
+通过`@context`创建一个隔离的数据空间.
 
 ```javascript
 import React, { Component, PropTypes } from 'react';
@@ -206,7 +206,7 @@ export default class App extends Component {
 
 ### 5.autorun 实现数据自动保存
 
-下边例子当UserModel数据发生变化时候会自动保存到localStorage
+`autorun`可以自动运行任意函数当所依赖的数据变动时, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
 
 ```javascript
 import { createModel } from '../../src';

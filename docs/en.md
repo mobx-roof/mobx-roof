@@ -2,13 +2,15 @@
 
 Mobx-roof is a simple React MVVM framework based on [mobx](https://github.com/mobxjs/mobx).
 
-### Guide
+## Guide
 
 You can see this example in the `example` folder.
 
-### Base
+## Base
 
-- 1.Create Model
+![image](https://os.alipayobjects.com/rmsportal/ocoJUnwRTPpvoUv.gif)
+
+### 1.Create Model
 
 Create a user login model first:
 
@@ -50,7 +52,7 @@ export default createModel({
 
 ```
 
-- 2.Bind to react component
+### 2.Bind to react component
 
 Use `@context` can create a isolate data space.
 
@@ -90,7 +92,7 @@ export default class App extends Component {
 }
 
 ```
-- 3.Get action state
+### 3.Get action state
 
 ```javascript
 @context({ user: UserModel })
@@ -127,7 +129,7 @@ export default class App extends Component {
   }
 }
 ```
-- 4.Split the react component by `@observer`
+### 4.Split the react component by `@observer`
 
 `@observer` can subsribe data from the parent context.
 
@@ -199,8 +201,9 @@ export default class App extends Component {
 
 ```
 
-- 5.Autorun
+### 5.Autorun
 
+Use `autorun` can auto exec any function if reactive data changed. The behind auto save user data to localStorage.
 
 ```javascript
 import { createModel } from '../../src';
@@ -247,7 +250,7 @@ export default createModel({
     },
   },
   autorun: {
-    // Auto save data to localStorage, `toJSON` can trigger this function always if any data changed.
+    // Auto save data to localStorage, `toJSON` can trigger this function if any data changed.
     saveToLocalStorage() {
       localStorage.setItem(STORE_KEY, JSON.stringify(this.toJSON()));
     },
@@ -255,5 +258,3 @@ export default createModel({
 });
 
 ```
-
-![image](https://os.alipayobjects.com/rmsportal/ocoJUnwRTPpvoUv.gif)
