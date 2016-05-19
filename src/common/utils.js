@@ -64,3 +64,7 @@ export function compose(arr, arg) {
     return cur.then(res => fn(res));
   }, Promise.resolve(arg));
 }
+
+export function nameToUpperCase(name = '') {
+  return name[0].toUpperCase() + name.slice(1);
+}

@@ -4,13 +4,11 @@ import React from 'react';
 import TestUtils from 'react-addons-test-utils';
 import ContextComponent from './helpers/ContextComponent';
 import { autorun, isObservable } from 'mobx';
-
 function renderContext(props = {}) {
   const renderer = TestUtils.createRenderer();
   renderer.render(<ContextComponent {...props} />);
   return renderer.getRenderOutput();
 }
-
 describe('mobx-roof', () => {
   const User = createModel({
     name: 'User',
@@ -32,7 +30,8 @@ describe('mobx-roof', () => {
         this.name = name;
       },
     },
-  }); it('api.createModel', async () => {
+  });
+  it('api.createModel', async() => {
     const user = new User;
     expect(isObservable(user)).to.eql(true);
     expect(isObservable(user.info)).to.eql(true);
@@ -44,7 +43,7 @@ describe('mobx-roof', () => {
     expect(user.name).to.eql('initName');
     let times = 0;
     autorun(() => {
-      times ++;
+      times++;
       return user.friends.join('') + ' and ' + user.name + ' are in ' + user.info.address + user.info.habits.join(',');
     });
     await user.changeName('me');
@@ -70,6 +69,7 @@ describe('mobx-roof', () => {
   });
   it('api.extendModel', () => {
     const ChineseUser = extendModel(User, {
+      name: 'ChineseUser',
       data: {
         chinese: {
           zodiac: 'dragon',
@@ -78,7 +78,8 @@ describe('mobx-roof', () => {
         info: 'from china',
       },
       actions: {
-        rename() {},
+        rename() {
+        },
       },
     });
     expect(ChineseUser.uuid).to.not.eql(User.uuid);
@@ -122,6 +123,15 @@ describe('mobx-roof', () => {
       id: 0,
     });
   });
+  it('name check and name to Uppercase', () => {
+    const User = createModel({
+      name: 'user',
+    });
+    expect(User.name).to.eql('User');
+    expect(() => extendModel(User, {})).to.throw(/need a name/);
+    expect(() => createModel({})).to.throw(/need a name/);
+    expect(extendModel(User, { name: 'extendUser' }).name).to.eql('ExtendUser');
+  });
   it('api.createModel constants', () => {
     const struct = {
       name: 'User',
@@ -133,7 +143,8 @@ describe('mobx-roof', () => {
     const User2Model = createModel({
       ...struct,
       actions: {
-        from() {},
+        from() {
+        },
       },
     });
     const user = new UserModel;
@@ -151,12 +162,14 @@ describe('mobx-roof', () => {
       },
     });
     const USAModel = extendModel(UserModel, {
+      name: 'USAUser',
       constants: {
         from: 'USA',
         other: 'other',
       },
     });
     const IndiaModel = extendModel(USAModel, {
+      name: 'IndiaUser',
       constants: {
         from: 'India',
         isChild: true,

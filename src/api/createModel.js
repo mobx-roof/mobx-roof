@@ -1,4 +1,5 @@
 import _MobxModel, { toMobxActions, isMobxModelClass } from '../core/MobxModel';
+import { nameToUpperCase } from '../common/utils';
 let uuid = 0;
 
 export default function createModel({ name, data = {}, constants = {}, actions = {}, autorun = {} }, Parent = _MobxModel) {
@@ -22,7 +23,7 @@ export default function createModel({ name, data = {}, constants = {}, actions =
       enumerable: false,
       configurable: true,
       writable: false,
-      value: name,
+      value: nameToUpperCase(name),
     },
   });
   MobxModel.prototype = Object.assign(MobxModel.prototype, mobxActions);
