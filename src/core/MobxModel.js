@@ -1,5 +1,5 @@
 import { extendObservable, toJSON, autorun } from 'mobx';
-import { mapValues, each, isRegExp } from '../common/utils';
+import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
 
@@ -17,7 +17,7 @@ export default class MobxModel {
     this._id = count ++;
     this._dataKeys = Object.keys(initData);
     this._checkDataKeys();
-    extendObservable(this, { ...initData });
+    extendObservable(this, toObservableObj(initData));
     each(autorunMap, (autorunFn) => {
       autorun(autorunFn, this);
     });

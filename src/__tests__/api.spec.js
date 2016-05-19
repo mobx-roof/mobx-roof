@@ -19,35 +19,41 @@ describe('mobx-roof', () => {
       info: {
         address: 'beijing',
         habits: [],
+        other: {
+          age: 33,
+        },
       },
-      friends: [],
+      friends: [{
+        name: 'Jack',
+      }],
     },
     actions: {
       changeName(name) {
         this.name = name;
       },
     },
-  });
-  beforeEach(() => {
-
-  });
-  it('api.createModel', async () => {
+  }); it('api.createModel', async () => {
     const user = new User;
+    expect(isObservable(user)).to.eql(true);
     expect(isObservable(user.info)).to.eql(true);
-    expect(isObservable(user.info.habits)).to.eql(true);
+    expect(isObservable(user.friends)).to.eql(true);
+    expect(isObservable(user.name)).to.eql(false);
+    expect(isObservable(user.info.habits)).to.eql(false);
+    expect(isObservable(user.info.other)).to.eql(false);
+    expect(isObservable(user.friends[0])).to.eql(false);
     expect(user.name).to.eql('initName');
-    let cache;
     let times = 0;
     autorun(() => {
       times ++;
-      cache = user.friends.join('') + ' and ' + user.name + ' are in ' + user.info.address;
+      return user.friends.join('') + ' and ' + user.name + ' are in ' + user.info.address + user.info.habits.join(',');
     });
     await user.changeName('me');
     user.friends.push('Jack');
     expect(times).to.eql(3);
     user.info.address = 'NanJing';
     expect(times).to.eql(4);
-    expect(cache).to.eql('Jack and me are in NanJing');
+    user.info.habits.push('swim');
+    expect(times).to.eql(4);
   });
   it('api.createModel with action defined', () => {
     const User = createModel({
@@ -68,6 +74,7 @@ describe('mobx-roof', () => {
         chinese: {
           zodiac: 'dragon',
         },
+        friends: [],
         info: 'from china',
       },
       actions: {

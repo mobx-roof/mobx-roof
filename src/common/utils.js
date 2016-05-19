@@ -1,5 +1,5 @@
 const toString = Object.prototype.toString;
-import { isObservable, observable } from 'mobx';
+import { asFlat } from 'mobx';
 import { CONTEXT_NAME } from './constants';
 import { PropTypes } from 'react';
 /**
@@ -38,18 +38,10 @@ export function toPromise(val) {
   }
   return Promise.resolve(val);
 }
-export function toObservableObj(obj) {
-  if (!obj || typeof obj !== 'object') throw new Error('Utils.toObservableObj need an object parameter.');
-  if (isObservable(obj)) return obj;
-  if (Array.isArray(obj)) {
-    return observable(obj.map(val => typeof val === 'object' ? toObservableObj(val) : val));
-  }
-  return observable(mapValues(obj, (val) => {
-    if (typeof val === 'function') {
-      throw new Error('Model initData must be a plainObject');
-    }
-    return typeof val === 'object' ? toObservableObj(val) : val;
-  }));
+export function toObservableObj(obj = {}) {
+  return mapValues(obj, (item) => {
+    return typeof item === 'object' ? asFlat(item) : item;
+  });
 }
 /**
  * @param {React.Component} WrappedComponent
