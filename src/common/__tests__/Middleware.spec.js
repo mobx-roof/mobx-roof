@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import Middleware from '../Middleware';
+import { CANCLE_KEY, END_KEY } from '../Control';
+
 describe('Middleware', () => {
-  const actionArg = { action: 'test', payload: 1 };
+  const actionArg = { action: 'test', payload: 0 };
   let middleware;
   beforeEach(() => {
     middleware = new Middleware;
@@ -42,5 +44,17 @@ describe('Middleware', () => {
     expect(middleware.isEmpty()).to.eql(false);
     middleware.remove([fn]);
     expect(middleware.isEmpty()).to.eql(true);
+  });
+  it('middleware control', async () => {
+    const fn = ({ payload }) => payload + 1;
+    middleware.use([fn, fn, fn]);
+    const res = await middleware.compose(actionArg, ({ payload }) => {
+      if (payload === 2) return CANCLE_KEY;
+    });
+    const res2 = await middleware.compose(actionArg, ({ payload }) => {
+      if (payload === 2) return END_KEY;
+    });
+    expect(res).to.eql(0);
+    expect(res2).to.eql(2);
   });
 });

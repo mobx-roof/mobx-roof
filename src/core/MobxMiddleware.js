@@ -77,7 +77,6 @@ export default class MobxMiddleware {
         return this._after.compose({ ...args, payload, pos: 'after' });
       })
       .catch((error) => {
-        // todo fixed error if no catch
         return this._error.compose({ ...args, payload: error, pos: 'error' }).then((error) => {
           if (error instanceof Error) {
             throw error;
