@@ -52,7 +52,7 @@ export default createModel({
 
 ```
 
-### 2.Bind to react component
+### 2.Bind data to react component
 
 Use `@context` can create a isolate data space.
 
@@ -246,6 +246,7 @@ export default createModel({
         isLogin: false,
         username: null,
         password: null,
+        userId: null,
       });
     },
   },

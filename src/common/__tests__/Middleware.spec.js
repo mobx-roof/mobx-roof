@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import Middleware from '../Middleware';
-import { CANCLE_KEY, END_KEY } from '../Control';
+import { CANCLE_KEY } from '../controls';
+import delay from '../../__tests__/helpers/delay';
 
 describe('Middleware', () => {
   const actionArg = { action: 'test', payload: 0 };
@@ -45,16 +46,12 @@ describe('Middleware', () => {
     middleware.remove([fn]);
     expect(middleware.isEmpty()).to.eql(true);
   });
-  it('middleware control', async () => {
-    const fn = ({ payload }) => payload + 1;
-    middleware.use([fn, fn, fn]);
-    const res = await middleware.compose(actionArg, ({ payload }) => {
-      if (payload === 2) return CANCLE_KEY;
-    });
-    const res2 = await middleware.compose(actionArg, ({ payload }) => {
-      if (payload === 2) return END_KEY;
-    });
-    expect(res).to.eql(0);
-    expect(res2).to.eql(2);
+  it('middleware cancel', async () => {
+    let count = 0;
+    const fn = () => count++;
+    middleware.use([fn, fn, () => CANCLE_KEY, fn]);
+    middleware.compose();
+    await delay(10);
+    expect(count).to.eql(2);
   });
 });

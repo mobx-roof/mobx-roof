@@ -1,5 +1,5 @@
 import { isFunction } from './utils';
-import Control, { CANCLE_KEY, END_KEY } from './Control';
+import { CANCLE_KEY } from './controls';
 
 export default class Middleware {
   middleware = [];
@@ -38,29 +38,16 @@ export default class Middleware {
   /**
    * Compose all middleware
    * @param {object} arg
-   * @param {function} controlFn
    * @return {Promise}
    */
-  compose(arg = {}, controlFn) {
+  compose(arg = {}) {
     return this.middleware.reduce((pm, fn) => {
       return pm.then((payload) => {
-        if (controlFn) {
-          const error = new Error('ControlError');
-          error.control = controlFn({ ...arg, payload });
-          error.payload = payload;
-          if (error.control instanceof Control) throw error;
+        if (payload === CANCLE_KEY) {
+          return payload;
         }
         return fn({ ...arg, payload });
       });
-    }, Promise.resolve(arg.payload)).catch((e) => {
-      if (e.control && e.control instanceof Control) {
-        if (e.control === END_KEY) {
-          return e.payload;
-        } else if (e.control === CANCLE_KEY) {
-          return arg.payload;
-        }
-      }
-      throw e;
-    });
+    }, Promise.resolve(arg.payload));
   }
 }

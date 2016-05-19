@@ -81,6 +81,7 @@ export default class MobxMiddleware {
           if (error instanceof Error) {
             throw error;
           }
+          return error;
         });
       });
   }

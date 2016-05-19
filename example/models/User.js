@@ -38,6 +38,7 @@ export default createModel({
         isLogin: false,
         username: null,
         password: null,
+        userId: null,
       });
     },
   },

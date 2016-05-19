@@ -2,7 +2,7 @@
 
 Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单Reac MVVM框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展
 
-下边的例子可以在项目`example`中找到
+下边完整的例子可以在项目`example`目录中找到
 
 ## 基础篇
 
@@ -12,7 +12,11 @@ Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单Reac MVVM框架
 
 ### 1.创建模型
 
-我们先通过`createModel`创建一个用户登录数据模型.
+我们先通过`createModel`创建一个用户登录数据模型:
+
+- `name`: 定义类名
+- `data`: 返回的数据会被转换成mobx的`reactive data`, 这种数据在变化时候会自动触发监听函数
+- `actions`: 定义模型的方法, 方法返回值会转换成`Promise`
 
 ```javascript
 import { createModel } from 'mobx-roof';
@@ -95,7 +99,7 @@ export default class App extends Component {
 
 ### 3.获取action状态
 
-通过`getActionState`可以获取任意的action执行状态, 当action开始执行时候状态`loading`为true, 如果执行失败错误信息会放到`error`中.
+通过`getActionState`可以获取任意的action执行状态, 状态里有`loading`和`error`两个字段, 当action开始执行时候状态`loading`为true, 而如果执行失败错误信息会存入`error`中.
 
 ```javascript
 @context({ user: UserModel })
@@ -134,10 +138,9 @@ export default class App extends Component {
 ```
 ### 4.拆分react组件, 实现组件间数据共享
 
-下边把从App组件拆分出`UserLogin`和`UserDetail`组件, `@observer` 可以订阅父节点context中的数据.
+下边例子从App组件拆分出了`UserLogin`和`UserDetail`组件, 并通过`@observer` 来订阅父节点context中的数据.
 
 ```javascript
-// example/App
 import React, { Component, PropTypes } from 'react';
 import { context, observer } from 'mobx-roof';
 import UserModel from './models/User';
@@ -206,7 +209,7 @@ export default class App extends Component {
 
 ### 5.autorun 实现数据自动保存
 
-`autorun`可以自动运行任意函数当所依赖的数据变动时, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
+`autorun`可以自动运行任意函数, 当该函数所依赖的数据变动时, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
 
 ```javascript
 import { createModel } from '../../src';
@@ -249,6 +252,7 @@ export default createModel({
         isLogin: false,
         username: null,
         password: null,
+        userId: null,
       });
     },
   },
