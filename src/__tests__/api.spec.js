@@ -124,7 +124,7 @@ describe('mobx-roof', () => {
   });
   it('api.createModel constants', () => {
     const struct = {
-      name: 'user',
+      name: 'User',
       constants: {
         from: 'China',
       },
@@ -142,6 +142,32 @@ describe('mobx-roof', () => {
     expect(() => user.from = 'USA').to.throw(/read only/);
     expect(() => new UserModel({ from: 'USA' })).to.throw(/not configurable/);
     expect(() => new User2Model()).to.throw(/defined in actions/);
+  });
+  it('api.extendModel constants', () => {
+    const UserModel = createModel({
+      name: 'User',
+      constants: {
+        from: 'China',
+      },
+    });
+    const USAModel = extendModel(UserModel, {
+      constants: {
+        from: 'USA',
+        other: 'other',
+      },
+    });
+    const IndiaModel = extendModel(USAModel, {
+      constants: {
+        from: 'India',
+        isChild: true,
+      },
+    });
+    const user = new IndiaModel;
+    expect(user.toJSON()).to.eql({
+      other: 'other',
+      from: 'India',
+      isChild: true,
+    });
   });
   it('api.createContext', () => {
     const output = renderContext();
