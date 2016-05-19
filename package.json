@@ -71,6 +71,7 @@
     ]
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "test"
   ]
 }
