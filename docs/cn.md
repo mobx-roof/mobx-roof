@@ -1,6 +1,6 @@
 # Mobx-Roof
 
-Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单Reac MVVM框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展
+Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展
 
 下边完整的例子可以在项目`example`目录中找到
 
@@ -271,6 +271,38 @@ export default createModel({
 高级篇会开始多个model的数据共享
 
 ### 1.中间件
+
+下边是一个简单的日志打印插件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤;
+
+```javascript
+// Before exec action
+function preLogger({ type, payload }) {
+  console.log(`${type} params: `, payload.join(', '));
+  return payload;
+}
+
+// Action exec fail
+function errorLogger({ type, payload }) {
+  console.log(`${type} error: `, payload.message);
+  return payload;
+}
+
+// After exec action
+function afterLogger({ type, payload }) {
+  console.log(`${type} result: `, payload);
+  return payload;
+}
+
+export default {
+  filter({ type }) {
+    return /user/.test(type);
+  },
+  before: preLogger,
+  after: afterLogger,
+  error: errorLogger,
+};
+
+```
 ### 2.数据关联
 ### 3.数据模型的继承
 ### 4.数据模型的嵌套

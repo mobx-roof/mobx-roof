@@ -12,7 +12,7 @@ export function login(username, password) {
       } else {
         res({ success: false, message: 'login error' });
       }
-    }, 1000);
+    }, 4000);
   });
 }
 

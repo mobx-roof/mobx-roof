@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import Middleware from '../Middleware';
-import { CANCLE_KEY } from '../controls';
-import delay from '../../__tests__/helpers/delay';
+import { cancel, CANCLE_KEY } from '../controls';
 
 describe('Middleware', () => {
   const actionArg = { action: 'test', payload: 0 };
@@ -49,9 +48,11 @@ describe('Middleware', () => {
   it('middleware cancel', async () => {
     let count = 0;
     const fn = () => count++;
-    middleware.use([fn, fn, () => CANCLE_KEY, fn]);
-    middleware.compose();
-    await delay(10);
-    expect(count).to.eql(2);
+    middleware.use([fn, fn, () => cancel(), fn]);
+    try {
+      await middleware.compose();
+    } catch (e) {
+      expect(e).to.eql(CANCLE_KEY);
+    }
   });
 });

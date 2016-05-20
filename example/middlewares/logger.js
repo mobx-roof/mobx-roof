@@ -17,6 +17,9 @@ function afterLogger({ type, payload }) {
 }
 
 export default {
+  filter({ type }) {
+    return /User/.test(type);
+  },
   before: preLogger,
   after: afterLogger,
   error: errorLogger,

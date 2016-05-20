@@ -1,8 +1,7 @@
 import MobxMiddleware from '../MobxMiddleware';
-import { CANCLE_KEY } from '../../common/controls';
+import { CANCLE_KEY, cancel as _cancel } from '../../common/controls';
 import UserModel from '../../__tests__/helpers/UserModel';
 import { expect } from 'chai';
-import delay from '../../__tests__/helpers/delay';
 
 describe('MobxMiddleware', () => {
   let middleware;
@@ -75,7 +74,7 @@ describe('MobxMiddleware', () => {
     expect(await checkFilter(checker, 'other')).to.eql(false);
   });
   it('constrol', async () => {
-    const cancel = () => CANCLE_KEY;
+    const cancel = () => _cancel();
     let res = '';
     const run = ({ payload, pos }) => {
       if (pos === 'before') {
@@ -94,23 +93,32 @@ describe('MobxMiddleware', () => {
       return await middleware.execAction({ actionName: 'test', actionFn(payload) { return payload; }, actionArgs: [''] });
     };
     // cancel control
-    exec({
-      before: [run, cancel, run],
-      after: [run, run, run],
-    });
-    await delay(5);
-    expect(res).to.eql('b');
-    exec({
-      before: [run, run],
-      after: [run, cancel, run],
-    });
-    await delay(5);
-    expect(res).to.eql('bba');
-    exec({
-      before: [run, () => { throw new Error('empty'); }, run],
-      error: [run, cancel, run],
-    });
-    await delay(5);
-    expect(res).to.eql('be');
+    try {
+      await exec({
+        before: [run, cancel, run],
+        after: [run, run, run],
+      });
+    } catch (e) {
+      expect(e).to.eql(CANCLE_KEY);
+      expect(res).to.eql('b');
+    }
+    try {
+      await exec({
+        before: [run, run],
+        after: [run, cancel, run],
+      });
+    } catch (e) {
+      expect(e).to.eql(CANCLE_KEY);
+      expect(res).to.eql('bba');
+    }
+    try {
+      await exec({
+        before: [run, () => { throw new Error('empty'); }, run],
+        error: [run, cancel, run],
+      });
+    } catch (e) {
+      expect(e).to.eql(CANCLE_KEY);
+      expect(res).to.eql('be');
+    }
   });
 });

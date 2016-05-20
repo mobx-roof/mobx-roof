@@ -1,5 +1,4 @@
 import { isFunction } from './utils';
-import { CANCLE_KEY } from './controls';
 
 export default class Middleware {
   middleware = [];
@@ -43,9 +42,6 @@ export default class Middleware {
   compose(arg = {}) {
     return this.middleware.reduce((pm, fn) => {
       return pm.then((payload) => {
-        if (payload === CANCLE_KEY) {
-          return payload;
-        }
         return fn({ ...arg, payload });
       });
     }, Promise.resolve(arg.payload));

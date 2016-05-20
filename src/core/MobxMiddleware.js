@@ -14,16 +14,20 @@ function toFilter(filter) {
 }
 
 export default class MobxMiddleware {
-  static toStandardMiddleware(middleware = {}) {
-    if (typeof middleware === 'function') {
+  static toStandardMiddleware(_middleware = {}) {
+    if (typeof _middleware === 'function') {
       return {
-        after: middleware,
+        after: _middleware,
       };
-    } else if (typeof middleware === 'object') {
-      middleware = { ...middleware };
-      Object.keys(middleware).forEach(key => {
+    } else if (typeof _middleware === 'object') {
+      const middleware = {};
+      Object.keys(_middleware).forEach(key => {
         if (!KEYS.includes(key)) {
           throw new Error(`[MobxMiddleware] Middleware key must one of "${KEYS.join(' ,')}"`);
+        }
+        // filter empty middleware
+        if (_middleware[key]) {
+          middleware[key] = _middleware[key];
         }
       });
       if (middleware.filter) {
@@ -42,7 +46,7 @@ export default class MobxMiddleware {
       }
       return middleware;
     }
-    throw new TypeError('[MobxMiddleware] Middleware must be a function or object but get ' + middleware);
+    throw new TypeError('[MobxMiddleware] Middleware must be a function or object but get ' + _middleware);
   }
   constructor() {
     this._before = new Middleware;
