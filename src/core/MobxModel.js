@@ -15,6 +15,11 @@ export default class MobxModel {
     this._actionStates = {};
     this._middleware = middleware || new MobxMiddleware;
     this._id = count ++;
+    Object.keys(initData).forEach((key) => {
+      if (constants[key] !== undefined) {
+        throw new Error(`[MobxModel] data key "${key}" is defined in constants`);
+      }
+    });
     // check keys
     this._dataKeys = Object.keys(initData).concat(Object.keys(constants));
     this._checkDataKeys();

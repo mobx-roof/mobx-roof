@@ -155,8 +155,19 @@ describe('mobx-roof', () => {
     expect(user.from).to.eql('China');
     expect(user.toJSON()).to.eql({ from: 'China' });
     expect(() => user.from = 'USA').to.throw(/read only/);
-    expect(() => new UserModel({ from: 'USA' })).to.throw(/not configurable/);
     expect(() => new User2Model()).to.throw(/defined in actions/);
+  });
+  it('api.createModel constants conflicted', () => {
+    const UserModel = createModel({
+      name: 'User',
+      constants: {
+        from: 'China',
+      },
+      data: {
+        from: 'China',
+      },
+    });
+    expect(() => new UserModel).to.throw(/is defined in constants/);
   });
   it('api.extendModel constants', () => {
     const UserModel = createModel({

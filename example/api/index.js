@@ -1,6 +1,6 @@
 const userDB = [
-  { username: 'Lili', from: 'USA', password: '123', id: '1' },
-  { username: 'Jack', from: 'Chinese', password: '123', id: '2' },
+  { username: 'Lili', from: 'USA', habits: ['Swim'], password: '123', id: '1' },
+  { username: 'Jack', from: 'Chinese', habits: ['football'], password: '123', id: '2' },
 ];
 
 export function login(username, password) {

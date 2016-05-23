@@ -209,7 +209,7 @@ export default class App extends Component {
 
 ### 5.autorun 实现数据自动保存
 
-`autorun`可以自动运行任意函数, 当该函数所依赖的数据变动时, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
+`autorun`可以在所依赖数据变动时候自动运行定义的函数, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
 
 ```javascript
 import { createModel } from '../../src';
@@ -295,7 +295,7 @@ function afterLogger({ type, payload }) {
 
 export default {
   filter({ type }) {
-    return /user/.test(type);
+    return /User/.test(type);
   },
   before: preLogger,
   after: afterLogger,
