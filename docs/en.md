@@ -203,7 +203,7 @@ export default class App extends Component {
 
 ### 5.Autorun
 
-Use `autorun` can auto exec any function if reactive data changed. The behind auto save user data to localStorage.
+Autorun can run any function automatically. And once the data related to this function change, the change of UserModel will be saved to localStorage automatically.
 
 ```javascript
 import { createModel } from '../../src';
