@@ -24,8 +24,8 @@ describe('MobRelation', () => {
   });
   it('parsePattern', () => {
     expect(() => relation.parsePattern('')).to.throw(/empty/);
-    expect(() => relation.parsePattern('user.login => preFilter')).to.throw(/illegal/);
-    expect(relation.parsePattern('|| user.login -> || -> todo.getList || ')).to.eql(
+    expect(() => relation.parsePattern('user.login =$ preFilter')).to.throw(/illegal/);
+    expect(relation.parsePattern('|| user.login -> = > -> todo.getList || ')).to.eql(
       {
         action: 'user.login',
         refs: ['user', 'todo'],

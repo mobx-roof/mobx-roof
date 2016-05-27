@@ -118,11 +118,11 @@ export default class MobxRelation {
     if (!pattern) {
       throw new Error(`[MobxRelation] Relation pattern can not be empty.`);
     }
-    if (!/^[\*\->\.a-zA-Z_\|]+$/.test(pattern)) {
+    if (!/^[\*\->\=\.a-zA-Z_\|]+$/.test(pattern)) {
       throw new Error(`[MobxRelation] Relation pattern "${pattern}" illegal.`);
     }
     const refs = [];
-    const chain = spliter(pattern, ['->', '|'], (key) => {
+    const chain = spliter(pattern, ['->', /\=\>|\|/], (key) => {
       if (isActionKey(key)) {
         const modelName = key.split('.')[0];
         if (!refs.includes(modelName)) refs.push(modelName);

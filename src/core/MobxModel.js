@@ -98,7 +98,7 @@ export default class MobxModel {
       }
     });
   }
-  set(key, val) {
+  @action set(key, val) {
     if (typeof key === 'string') {
       this[key] = val;
       return this;
@@ -120,6 +120,7 @@ export function toMobxActions(actions) {
       // 1. add loading state and save the pre error
       this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
+      // todo: mobx.action can not support in async/await function
       return this._middleware.execAction({ actionFn: action(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import MobxModel from '../MobxModel';
-import { observable, action } from 'mobx';
+import { observable } from 'mobx';
 import UserModel from '../../__tests__/helpers/UserModel';
 
 describe('MobxModel', () => {
@@ -94,15 +94,11 @@ describe('MobxModel', () => {
         if (times === 2) done();
       },
     });
-    // expect(() => model.set({ username: 'username' })).to.throw(/strict mode/);
-    const func = action(() => {
-      model.set({
-        username: 'username',
-        password: 'password',
-        undefine: 'undefined',
-      });
-      model.set('username', 'username');
+    model.set({
+      username: 'username',
+      password: 'password',
+      undefine: 'undefined',
     });
-    func();
+    model.set('username', 'username');
   });
 });
