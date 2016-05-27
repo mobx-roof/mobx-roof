@@ -14,7 +14,8 @@ export default createModel({
       username: null,
       userId: null,
       loginError: '',
-      userInfo: {},
+      habits: [],
+      from: null,
       ...data,
     };
   },
@@ -32,6 +33,13 @@ export default createModel({
       } else {
         this.loginError = res.message;
       }
+    },
+    async fetchUserInfo() {
+      const res = await api.fetchUserInfo(this.userId);
+      this.set({
+        from: res.from,
+        habits: res.habits,
+      });
     },
     logout() {
       this.set({

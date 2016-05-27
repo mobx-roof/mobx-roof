@@ -1,24 +1,24 @@
 // Before exec action
 function preLogger({ type, payload }) {
-  console.log(`${type} params: `, payload.join(', '));
+  console.log(`[${type}] params: `, payload.join(', '));
   return payload;
 }
 
 // Action exec fail
 function errorLogger({ type, payload }) {
-  console.log(`${type} error: `, payload.message);
+  console.log(`[${type}] error: `, payload.message);
   return payload;
 }
 
 // After exec action
 function afterLogger({ type, payload }) {
-  console.log(`${type} result: `, payload);
+  console.log(`[${type}] result: `, payload);
   return payload;
 }
 
 export default {
   filter({ type }) {
-    return /User/.test(type);
+    return /^User/.test(type);
   },
   before: preLogger,
   after: afterLogger,

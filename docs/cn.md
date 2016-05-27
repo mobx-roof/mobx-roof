@@ -233,28 +233,7 @@ export default createModel({
     };
   },
   actions: {
-    async login(username, password) {
-      const res = await api.login(username, password);
-      if (res.success) {
-        this.set({
-          userId: res.id,
-          isLogin: true,
-          loginError: null,
-          username,
-          password,
-        });
-      } else {
-        this.loginError = res.message;
-      }
-    },
-    logout() {
-      this.set({
-        isLogin: false,
-        username: null,
-        password: null,
-        userId: null,
-      });
-    },
+    // ...
   },
   autorun: {
     // 自动保存到localStorage, `toJS` 会获取该model的所有数据
@@ -268,12 +247,154 @@ export default createModel({
 
 ## 高级篇
 
-高级篇会开始多个model的数据共享
+### model的扩展
 
-### 1.中间件
+- 1.model的继承及重载
+
+```javascript
+import { extendModel } from 'mobx-roof';
+import User from './User'
+export default extendModel(User, {
+  name: 'ChineseUser',
+  // 可以使用函数或者对象声明方式
+  data: {
+    chinese: {
+      zodiac: 'dragon',
+    },
+  },
+  actions: {
+    async fetchUserInfo() {
+      // Overide user.fetchUserInfo
+      await User.actions.fetchUserInfo.apply(this, arguments);
+    },
+  },
+});
+
+```
+
+- 2.model的嵌套使用
+
+```javascript
+import * as api from '../api';
+
+const TodoItem = createModel({
+  name: 'TodoItem',
+  data({ text, userId, completed, id }) {
+    return {
+      text,
+      userId,
+      completed,
+      id,
+    };
+  }
+});
+
+export default createModel({
+  name: 'Todos',
+  data() {
+    return {
+      list: [],
+    };
+  },
+  actions: {
+    add(text, userId) {
+      // Add Other model
+      this.list.push(new TodoItem({ text, userId }));
+    },
+  },
+});
+```
+
+### model的数据关联
+
+当多个model之间需要互动时候, mobx-roof提供了`Relation`方式, 下边创建一个Relation, 其中 `relation.init` 方法会在第一次创建`context`之后执行
+
+```javascript
+import { Relation } from 'mobx-roof';
+const relation = new Relation;
+
+relation.init((context) => {
+  const { user, todos } = context;
+  console.log(user); // userModel instance
+  console.log(todos); // todoModel instance
+});
+export default relation;
+```
+
+把`relation`加到`@context`中;
+
+```javascript
+import { context } from 'mobx-roof';
+import middleware from './middlewares';
+import relation from './relations';
+
+@context({ user: UserModel, todos: TodosModel }, { middleware, relation })
+export default class App extends Component {
+  //...
+}
+```
+
+relation提供了多种数据监听方式, 如下, 其中回调结果中`payload` 为action返回结果, `action` 为action对应的名字, `context`为对应作用域
+
+- 1.监听一个
+
+```javascript
+relation.listen('user.login', ({ context, payload, action }) => {
+  console.log('[relation] user.login: ', payload, context);
+});
+```
+
+- 2.多个匹配
+
+```javascript
+relation.listen(/^user/, ({ action }) => {
+  console.log('[relation] user action name: ', action);
+});
+
+// or
+
+relation.listen('user.login; user.fetchUserInfo', ({ action }) => {
+  // ...
+});
+
+```
+
+- 3.多行方式
+
+`->` 表示串联执行, `=>` 会将前一个数据传递到后一个
+
+```javascript
+relation.listen(`
+  # 注释
+  user.login -> user.fetchUserInfo;
+  user.login => todos.getByUserId
+`);
+```
+
+- 4.过滤器
+
+```javascript
+const relation = new Relation({
+  filters: {
+    filter1(payload) {
+      return payload;
+    },
+    filter2(payload) {
+      return payload;
+    },
+  },
+});
+relation.listen(`
+  ## comment
+  user.login -> user.fetchUserInfo;
+  user.login | filter1 => filter2 | todos.getByUserId
+`);
+
+```
+
+### 中间件的使用
 
 下边是一个简单的日志打印插件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤;
-
 ```javascript
 // Before exec action
 function preLogger({ type, payload }) {
@@ -284,6 +405,7 @@ function preLogger({ type, payload }) {
 // Action exec fail
 function errorLogger({ type, payload }) {
   console.log(`${type} error: `, payload.message);
+  // 这里如果返回null将截断错误
   return payload;
 }
 
@@ -295,7 +417,7 @@ function afterLogger({ type, payload }) {
 
 export default {
   filter({ type }) {
-    return /User/.test(type);
+    return /^User/.test(type);
   },
   before: preLogger,
   after: afterLogger,
@@ -303,6 +425,19 @@ export default {
 };
 
 ```
-### 2.数据关联
-### 3.数据模型的继承
-### 4.数据模型的嵌套
+
+添加到`@context`中:
+
+```javascript
+import { Middleware, context } from 'mobx-roof';
+import logger from './logger';
+const middleware = new Middleware;
+middleware.use(
+  logger,
+);
+@context({ user: UserModel }, { middleware })
+export default class App extends Component {
+  //...
+}
+```
+

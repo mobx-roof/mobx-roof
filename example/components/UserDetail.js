@@ -12,7 +12,13 @@ export default class UserDetail extends Component {
   render() {
     return (
       <div className="container">
-        Welcome! {this.props.user.username}
+        <div>
+          Welcome! {this.props.user.username}
+        </div>
+        <ul>
+          <li><label>FROM: </label>{this.props.user.from}</li>
+          <li><label>HABITS: </label>{this.props.user.habits}</li>
+        </ul>
         <button onClick={::this.logout}>logout</button>
       </div>
     );
