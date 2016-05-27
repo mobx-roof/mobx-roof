@@ -15,7 +15,7 @@ function checkFilters(filters) {
     Object.keys(filters).forEach((key) => {
       const filter = filters[key];
       if (typeof filter !== 'function') {
-        throw new TypeError(`[MobxRelation] filter "${key}" must be a function`);
+        throw new TypeError(`[MobxRelation] filters "${key}" must be a function`);
       }
     });
   } else {

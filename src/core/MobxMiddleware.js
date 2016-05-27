@@ -73,7 +73,7 @@ export default class MobxMiddleware {
       .compose({ ...args, payload: actionArgs, pos: 'before' })
       .then((args) => {
         if (!Array.isArray(args)) {
-          throw new Error('[MobxMiddleware] Pre middleware must return aguments');
+          throw new Error('[MobxMiddleware] Pre middleware must return arguments');
         }
         return actionFn.apply(actionContext, args);
       })

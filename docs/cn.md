@@ -38,7 +38,7 @@ export default createModel({
     async login(username, password) {
       const res = await api.login(username, password);
       if (res.success) {
-        // 使用set可以设定多个值, 并只触发一次数据变动事件
+        // 使用set或者直接赋值方式都会触发一次数据变动事件
         this.set({
           userId: res.id,
           username,

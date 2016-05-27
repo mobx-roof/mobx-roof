@@ -1,4 +1,4 @@
-import { extendObservable, toJSON, autorun, transaction } from 'mobx';
+import { extendObservable, toJSON, autorun, transaction, action } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
@@ -116,7 +116,7 @@ export function toMobxActions(actions) {
       // 1. add loading state and save the pre error
       this._actionStates[actionName] = { loading: true, error: this._actionStates[actionName].error };
       // 2. exec action with hooks
-      return this._middleware.execAction({ actionFn, actionName, actionArgs, actionContext })
+      return this._middleware.execAction({ actionFn: action(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success
           this._actionStates[actionName] = { loading: false, error: null };

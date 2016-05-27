@@ -201,4 +201,33 @@ describe('mobx-roof', () => {
     const output = renderContext();
     expect(Object.keys(output.props)).to.eql(['user', 'todo']);
   });
+  it('mobx action run times', async () => {
+    let times = 0;
+    const Pos = createModel({
+      name: 'Pos',
+      data: {
+        x: 1,
+        y: 2,
+      },
+      actions: {
+        setPos() {
+          this.x ++;
+          this.y ++;
+        },
+        setPos2() {
+          this.set({ x: this.x + 1, y: this.y + 1 });
+        },
+      },
+      autorun: {
+        run() {
+          times ++;
+          return this.toJSON();
+        },
+      },
+    });
+    const pos = new Pos;
+    await pos.setPos();
+    await pos.setPos2();
+    expect(times).to.eql(3);
+  });
 });
