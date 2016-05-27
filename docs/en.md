@@ -12,22 +12,30 @@ You can see this example in the `example` folder.
 
 ### 1.Create Model
 
-Create a user login model first:
+我们先通过`createModel`创建一个用户登录数据模型:
+
+- `name`: define class name capitalized.
+- `data`: data can be declare as `Object` or `Function`, function returns will transfer to mobx `observable data`, function first param as Model init data. 
+- `actions`: define actions to change `observer data`, and return a `Promise`
+- `autorun`: can run any function automatically.
 
 ```javascript
 import { createModel } from 'mobx-roof';
 import * as api from '../api';
+const STORE_KEY = 'mobx-roof';
 
 export default createModel({
   name: 'User',
   data() {
+    // Init data from localStorage
+    let data = localStorage.getItem(STORE_KEY);
+    data = data ? JSON.parse(data) : {};
     return {
       isLogin: false,
-      password: null,
-      username: null,
       userId: null,
       loginError: '',
-      userInfo: {},
+      // ...
+      ...data,
     };
   },
   actions: {
@@ -37,15 +45,19 @@ export default createModel({
         // "set" can set more values and just trigger data changed once.
         this.set({
           userId: res.id,
-          username,
-          password,
           isLogin: true,
-          loginError: null,
+          // ...
         });
       } else {
         // This also can trigger data changed.
         this.loginError = res.message;
       }
+    },
+  },
+  autorun: {
+    saveToLocalStorage() {
+      // "toJS" get a JSON data
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
 });
@@ -201,63 +213,212 @@ export default class App extends Component {
 
 ```
 
-### 5.Autorun
+## More
 
-Autorun can run any function automatically. And once the data related to this function change, the change of UserModel will be saved to localStorage automatically.
+### Model extends
+
+- 1.Model extends and overide
 
 ```javascript
-import { createModel } from '../../src';
-import * as api from '../api';
-const STORE_KEY = 'mobx-roof';
-
-export default createModel({
-  name: 'User',
-  data() {
-    // Init data from localStorage
-    let data = localStorage.getItem(STORE_KEY);
-    data = data ? JSON.parse(data) : {};
-    return {
-      isLogin: false,
-      password: null,
-      username: null,
-      userId: null,
-      loginError: '',
-      userInfo: {},
-      ...data,
-    };
+import { extendModel } from 'mobx-roof';
+import User from './User'
+export default extendModel(User, {
+  name: 'ChineseUser',
+  // Declare by Object or Function
+  data: {
+    chinese: {
+      zodiac: 'dragon',
+    },
   },
   actions: {
-    async login(username, password) {
-      const res = await api.login(username, password);
-      if (res.success) {
-        this.set({
-          userId: res.id,
-          isLogin: true,
-          loginError: null,
-          username,
-          password,
-        });
-      } else {
-        this.loginError = res.message;
-      }
-    },
-    logout() {
-      this.set({
-        isLogin: false,
-        username: null,
-        password: null,
-        userId: null,
-      });
-    },
-  },
-  autorun: {
-    // Auto save data to localStorage, `toJS` can get all data in this model
-    saveToLocalStorage() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
+    async fetchUserInfo() {
+      // Overide user.fetchUserInfo
+      await User.actions.fetchUserInfo.apply(this, arguments);
     },
   },
 });
 
 ```
 
-## More
+- 2.Model with SubModel
+
+```javascript
+import * as api from '../api';
+
+const TodoItem = createModel({
+  name: 'TodoItem',
+  data({ text, userId, completed, id }) {
+    return {
+      text,
+      userId,
+      completed,
+      id,
+    };
+  }
+});
+
+export default createModel({
+  name: 'Todos',
+  data() {
+    return {
+      list: [],
+    };
+  },
+  actions: {
+    add(text, userId) {
+      // Add sub model
+      this.list.push(new TodoItem({ text, userId }));
+    },
+  },
+});
+```
+
+### Relation
+
+`relation.init`
+
+```javascript
+import { Relation } from 'mobx-roof';
+const relation = new Relation;
+
+relation.init((context) => {
+  const { user, todos } = context;
+  console.log(user); // userModel instance
+  console.log(todos); // todoModel instance
+});
+export default relation;
+```
+
+Add `relation` to `@context`;
+
+```javascript
+import { context } from 'mobx-roof';
+import middleware from './middlewares';
+import relation from './relations';
+
+@context({ user: UserModel, todos: TodosModel }, { middleware, relation })
+export default class App extends Component {
+  //...
+}
+```
+
+`Relation` provides a variety of data monitoring methods, as follows, `payload`  as action result, `action`  as action name, `context` is current context.
+
+- 1.Listen one
+
+```javascript
+relation.listen('user.login', ({ context, payload, action }) => {
+  console.log('[relation] user.login: ', payload, context);
+});
+```
+
+- 2.Listen more
+
+RegExp or with a semicolon separated list.
+
+```javascript
+relation.listen(/^user/, ({ action }) => {
+  console.log('[relation] user action name: ', action);
+});
+
+relation.listen('user.login; user.fetchUserInfo', ({ action }) => {
+  // ...
+});
+
+```
+
+- 3.Multi line
+
+`->`: Execute in order
+`=>`: The previous action results will be transferred to the next action as a parameter
+
+```javascript
+relation.listen(`
+  # comment
+  user.login -> user.fetchUserInfo;
+  user.login => todos.getByUserId
+`);
+```
+
+- 4.filters
+
+```javascript
+const relation = new Relation({
+  filters: {
+    filter1(payload) {
+      return payload;
+    },
+    filter2(payload) {
+      return payload;
+    },
+  },
+});
+relation.listen(`
+  ## comment
+  user.login -> user.fetchUserInfo;
+  user.login | filter1 => filter2 | todos.getByUserId
+`);
+
+```
+
+- 5.Relation.autorun
+
+`Relation` provides global `autorun` and can add multiple times.
+
+```javascript
+relation.autorun((context) => {
+  console.log('[autorun] ', context.user.toJS());
+  console.log('[autorun] ', context.todos.toJS());
+});
+
+```
+
+### Middleware
+
+Below is a simple logger Middleware, `filter` can be `String`, `RegExp` or `function`;
+
+```javascript
+// Before exec action
+function preLogger({ type, payload }) {
+  console.log(`${type} params: `, payload.join(', '));
+  return payload;
+}
+
+// Action exec fail
+function errorLogger({ type, payload }) {
+  console.log(`${type} error: `, payload.message);
+  // If null returns the error that will be stop.
+  return payload;
+}
+
+// After exec action
+function afterLogger({ type, payload }) {
+  console.log(`${type} result: `, payload);
+  return payload;
+}
+
+export default {
+  filter({ type }) {
+    return /^User/.test(type);
+  },
+  before: preLogger,
+  after: afterLogger,
+  error: errorLogger,
+};
+
+```
+
+Add to `@context`:
+
+```javascript
+import { Middleware, context } from 'mobx-roof';
+import logger from './logger';
+const middleware = new Middleware;
+middleware.use(
+  logger,
+);
+@context({ user: UserModel }, { middleware })
+export default class App extends Component {
+  //...
+}
+```

@@ -1,6 +1,6 @@
 # Mobx-Roof
 
-Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展
+Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框架, 目标是通过更ORM化的思维来管理数据, 如通过`继承`, `重载` 等面向对象方式来实现数据模型的扩展, 并通过`Relation`来实现数据间的关联.
 
 下边完整的例子可以在项目`example`目录中找到
 
@@ -14,24 +14,28 @@ Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框�
 
 我们先通过`createModel`创建一个用户登录数据模型:
 
-- `name`: 定义类名
-- `data`: 返回的数据会被转换成mobx的`reactive data`, 这种数据在变化时候会自动触发监听函数
-- `actions`: 定义模型的方法, 方法返回值会转换成`Promise`
+- `name`: 定义类名, 类名首字母大写
+- `data`: 可以通过`对象`声明或者`函数`声明, 函数返回的数据会被转换成mobx的`observable data`, 函数的第一个参数可以当成Model实例化的初始数据
+- `actions`: 定义模型的方法, 可以使用`async/await`处理异步方法, 方法返回值会转换成`Promise`, 其中对象提供了`set`方法可以快速修改多个数据, 而`toJS` 方法可以将数据转换成JSON格式
+- `autorun`: 可以在所依赖数据变动时候自动运行定义的函数, 下边例子当User数据发生变化时候会自动保存到localStorage
 
 ```javascript
 import { createModel } from 'mobx-roof';
 import * as api from '../api';
+const STORE_KEY = 'mobx-roof';
 
 export default createModel({
   name: 'User',
   data() {
+    // 从localStorage初始化数据
+    let data = localStorage.getItem(STORE_KEY);
+    data = data ? JSON.parse(data) : {};
     return {
       isLogin: false,
-      password: null,
-      username: null,
       userId: null,
       loginError: '',
-      userInfo: {},
+      // ...
+      ...data,
     };
   },
   actions: {
@@ -41,15 +45,18 @@ export default createModel({
         // 使用set只会触发一次数据变动事件
         this.set({
           userId: res.id,
-          username,
-          password,
           isLogin: true,
-          loginError: null,
+          // ...
         });
       } else {
         // 直接赋值会触发一次数据变动事件
         this.loginError = res.message;
       }
+    },
+  },
+  autorun: {
+    saveToLocalStorage() {
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
 });
@@ -138,7 +145,7 @@ export default class App extends Component {
 ```
 ### 4.拆分react组件, 实现组件间数据共享
 
-下边例子从App组件拆分出了`UserLogin`和`UserDetail`组件, 并通过`@observer` 来订阅父节点context中的数据.
+下边例子从App组件拆分出了`UserLogin`和`UserDetail`组件, 并通过`@observer` 来订阅父节点context中的数据, `@observer`可以通过`字符串`, `数组` 或`Model`类声明, 字符串会从父context查找数据, 而类声明会做数据强类型校验
 
 ```javascript
 import React, { Component, PropTypes } from 'react';
@@ -207,56 +214,17 @@ export default class App extends Component {
 
 ```
 
-### 5.autorun 实现数据自动保存
-
-`autorun`可以在所依赖数据变动时候自动运行定义的函数, 下边例子当UserModel数据发生变化时候会自动保存到localStorage
-
-```javascript
-import { createModel } from '../../src';
-import * as api from '../api';
-const STORE_KEY = 'mobx-roof';
-
-export default createModel({
-  name: 'User',
-  data() {
-    // 从localStorage初始化数据
-    let data = localStorage.getItem(STORE_KEY);
-    data = data ? JSON.parse(data) : {};
-    return {
-      isLogin: false,
-      password: null,
-      username: null,
-      userId: null,
-      loginError: '',
-      userInfo: {},
-      ...data,
-    };
-  },
-  actions: {
-    // ...
-  },
-  autorun: {
-    // 自动保存到localStorage, `toJS` 会获取该model的所有数据
-    saveToLocalStorage() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
-    },
-  },
-});
-
-```
-
 ## 高级篇
 
-### model的扩展
+### Model的扩展
 
-- 1.model的继承及重载
+- 1.model的继承及重载, 继承后的新Model会拥有父类所有的`data`, `actions` 和 `autorun` 方法
 
 ```javascript
 import { extendModel } from 'mobx-roof';
 import User from './User'
 export default extendModel(User, {
   name: 'ChineseUser',
-  // 可以使用函数或者对象声明方式
   data: {
     chinese: {
       zodiac: 'dragon',
@@ -264,7 +232,7 @@ export default extendModel(User, {
   },
   actions: {
     async fetchUserInfo() {
-      // Overide user.fetchUserInfo
+      // 重载了 user.fetchUserInfo 方法
       await User.actions.fetchUserInfo.apply(this, arguments);
     },
   },
@@ -274,7 +242,7 @@ export default extendModel(User, {
 
 - 2.model的嵌套使用
 
-下边例子`Todos`嵌套了`TodoItem`
+下边例子`Todos`嵌套了`TodoItem`, 嵌套的数据通过`toJS`方法去转换会自动遍历所有Model数据
 
 ```javascript
 import * as api from '../api';
@@ -309,7 +277,7 @@ export default createModel({
 
 ### Relation
 
-当多个model之间需要互动时候, mobx-roof提供了`Relation`方式, 下边创建一个Relation, 其中 `relation.init` 方法会在第一次创建`context`之后执行
+当多个model之间需要互动时候, mobx-roof提供了`Relation`方式, 下边初始化了一个Relation, 其中 `relation.init` 方法会在第一次创建`context`之后执行, `Relation`可以被使用在多个context中且不互相影响
 
 ```javascript
 import { Relation } from 'mobx-roof';
@@ -323,7 +291,7 @@ relation.init((context) => {
 export default relation;
 ```
 
-把`relation`加到`@context`中;
+把`relation`加到`context`中;
 
 ```javascript
 import { context } from 'mobx-roof';
@@ -354,8 +322,6 @@ relation.listen('user.login', ({ context, payload, action }) => {
 relation.listen(/^user/, ({ action }) => {
   console.log('[relation] user action name: ', action);
 });
-
-// or
 
 relation.listen('user.login; user.fetchUserInfo', ({ action }) => {
   // ...
@@ -398,7 +364,7 @@ relation.listen(`
 
 - 5.relation.autorun
 
-relation 还提供全局的autorun方法, 用于处理多个model的复杂关系逻辑
+relation 还提供全局的autorun方法, 可以添加多个, 用于处理多个model的复杂关系逻辑
 
 ```javascript
 relation.autorun((context) => {
@@ -410,7 +376,7 @@ relation.autorun((context) => {
 
 ### 中间件的使用
 
-下边是一个简单的日志打印中间件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤;
+下边是一个简单的日志打印中间件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤, fitler可以是`字符串`, `正则表达式` 或者 `函数`;
 ```javascript
 // Before exec action
 function preLogger({ type, payload }) {
