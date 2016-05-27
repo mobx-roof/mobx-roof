@@ -122,18 +122,16 @@ describe('MobRelation', () => {
   it('relation init', (done) => {
     expect(() => relation.init()).to.throw(/need a function/);
     relation.init((ctx) => {
-      expect(ctx).to.eql(context);
       // data loaded
-      expect(Object.keys(context.data).length).to.eql(2);
+      expect(Object.keys(ctx).length).to.eql(2);
       done();
     });
   });
   it('relation autorun', (done) => {
     let times = 0;
-    relation.autorun((context) => {
+    relation.autorun((ctx) => {
       times ++;
-      const user = context.find('user');
-      // Depend on reactive user data
+      const user = ctx.user;
       user.toJSON();
       if (times === 2) {
         done();

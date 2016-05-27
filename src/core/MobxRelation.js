@@ -53,11 +53,11 @@ export default class MobxRelation {
   }
   triggerAutorun(context) {
     this._autoruns.forEach(fn => {
-      autorun(fn.bind(null, context));
+      autorun(fn.bind(null, context.data));
     });
   }
   triggerInit(context) {
-    if (this._init) this._init(context);
+    if (this._init) this._init(context.data);
   }
   listen(patterns, fn, errorFn) {
     if (typeof patterns === 'string') {
@@ -80,6 +80,7 @@ export default class MobxRelation {
     return this;
   }
   execInMiddleware({ fullname, payload, context }) {
+    context = { ...context.data };
     this._relations.forEach(({ pattern, fn, errorFn }) => {
       let chain = [];
       if ((!isRegExp(pattern.action) && fullname !== pattern.action) || (isRegExp(pattern.action) && !pattern.action.test(fullname))) return;
@@ -94,8 +95,8 @@ export default class MobxRelation {
           if (typeof key === 'string') {
             if (isActionKey(key)) {
               const [name, action] = key.split('.');
-              const model = context.find(name);
-              if (model[action]) {
+              const model = context[name];
+              if (model && model[action]) {
                 return model[action].bind(model);
               }
               throw new Error(`[MobxRelation] Action "${key}" is not defined.`);
@@ -105,10 +106,10 @@ export default class MobxRelation {
           return key;
         });
         compose(chain, payload)
-          .then(res => fn({ context, payload: res }))
-          .catch(e => errorFn({ context, payload: e }));
+          .then(res => fn({ context, payload: res, action: fullname }))
+          .catch(e => errorFn({ context, payload: e, action: fullname }));
       } catch (e) {
-        errorFn({ context, payload: e });
+        errorFn({ context, payload: e, action: fullname });
       }
     });
   }
@@ -121,7 +122,7 @@ export default class MobxRelation {
     if (!pattern) {
       throw new Error(`[MobxRelation] Relation pattern can not be empty.`);
     }
-    if (!/^[\*\->\=\.a-zA-Z_\|]+$/.test(pattern)) {
+    if (!/^[\#\-\>\=\.a-zA-Z_0-9\|]+$/.test(pattern)) {
       throw new Error(`[MobxRelation] Relation pattern "${pattern}" illegal.`);
     }
     const refs = [];
