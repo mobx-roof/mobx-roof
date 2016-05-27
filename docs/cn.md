@@ -26,7 +26,7 @@ const STORE_KEY = 'mobx-roof';
 
 export default createModel({
   name: 'User',
-  data() {
+  data(initData) {
     // 从localStorage初始化数据
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
@@ -65,7 +65,7 @@ export default createModel({
 
 ### 2.绑定到react组件
 
-通过`@context`创建一个隔离的数据空间.
+通过`@context`创建一个隔离的数据空间, 并在创建的时候实例化所有声明的Model.
 
 ```javascript
 import React, { Component, PropTypes } from 'react';
@@ -104,7 +104,7 @@ export default class App extends Component {
 
 ```
 
-### 3.获取action状态
+### 3.获取action执行状态
 
 通过`getActionState`可以获取任意的action执行状态, 状态里有`loading`和`error`两个字段, 当action开始执行时候状态`loading`为true, 而如果执行失败错误信息会存入`error`中.
 
@@ -145,7 +145,7 @@ export default class App extends Component {
 ```
 ### 4.拆分react组件, 实现组件间数据共享
 
-下边例子从App组件拆分出了`UserLogin`和`UserDetail`组件, 并通过`@observer` 来订阅父节点context中的数据, `@observer`可以通过`字符串`, `数组` 或`Model`类声明, 字符串会从父context查找数据, 而类声明会做数据强类型校验
+下边例子从App组件拆分出了`UserLogin`和`UserDetail`组件, 并通过`@observer` 来订阅父节点context中的数据, `@observer`可以通过`字符串`, `数组字符串` 或`Model`类声明, 字符串会从父context查找数据, 而类声明会做数据强类型校验
 
 ```javascript
 import React, { Component, PropTypes } from 'react';
@@ -242,7 +242,7 @@ export default extendModel(User, {
 
 - 2.model的嵌套使用
 
-下边例子`Todos`嵌套了`TodoItem`, 嵌套的数据通过`toJS`方法去转换会自动遍历所有Model数据
+下边例子`Todos`嵌套了`TodoItem`, 嵌套的Model通过`toJS`方法会自动遍历所有Model类数据并做转换
 
 ```javascript
 import * as api from '../api';
