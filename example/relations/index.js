@@ -37,4 +37,9 @@ relation.listen(`
   user.login | filter1 => filter2 | todos.getByUserId
 `);
 
+relation.autorun((context) => {
+  console.log('[autorun] ', context.user.toJS());
+  console.log('[autorun] ', context.todos.toJS());
+});
+
 export default relation;

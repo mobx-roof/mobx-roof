@@ -43,7 +43,7 @@ export default createModel({
           loginError: null,
         });
       } else {
-        // This can trigger data changed.
+        // This also can trigger data changed.
         this.loginError = res.message;
       }
     },
@@ -92,7 +92,7 @@ export default class App extends Component {
 }
 
 ```
-### 3.Get action state
+### 3.Get action state by `getActionState`
 
 ```javascript
 @context({ user: UserModel })
@@ -259,3 +259,5 @@ export default createModel({
 });
 
 ```
+
+## More

@@ -38,7 +38,7 @@ export default createModel({
     async login(username, password) {
       const res = await api.login(username, password);
       if (res.success) {
-        // 使用set或者直接赋值方式都会触发一次数据变动事件
+        // 使用set只会触发一次数据变动事件
         this.set({
           userId: res.id,
           username,
@@ -274,6 +274,8 @@ export default extendModel(User, {
 
 - 2.model的嵌套使用
 
+下边例子`Todos`嵌套了`TodoItem`
+
 ```javascript
 import * as api from '../api';
 
@@ -305,7 +307,7 @@ export default createModel({
 });
 ```
 
-### model的数据关联
+### Relation
 
 当多个model之间需要互动时候, mobx-roof提供了`Relation`方式, 下边创建一个Relation, 其中 `relation.init` 方法会在第一次创建`context`之后执行
 
@@ -346,6 +348,8 @@ relation.listen('user.login', ({ context, payload, action }) => {
 
 - 2.多个匹配
 
+可以使用正则匹配, 或者用`;`分开列举
+
 ```javascript
 relation.listen(/^user/, ({ action }) => {
   console.log('[relation] user action name: ', action);
@@ -361,7 +365,7 @@ relation.listen('user.login; user.fetchUserInfo', ({ action }) => {
 
 - 3.多行方式
 
-`->` 表示串联执行, `=>` 会将前一个数据传递到后一个
+`->` 表示串联执行, `=>` 会将前一个action结果数据传递到后一个action当成参数
 
 ```javascript
 relation.listen(`
@@ -392,9 +396,21 @@ relation.listen(`
 
 ```
 
+- 5.relation.autorun
+
+relation 还提供全局的autorun方法, 用于处理多个model的复杂关系逻辑
+
+```javascript
+relation.autorun((context) => {
+  console.log('[autorun] ', context.user.toJS());
+  console.log('[autorun] ', context.todos.toJS());
+});
+
+```
+
 ### 中间件的使用
 
-下边是一个简单的日志打印插件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤;
+下边是一个简单的日志打印中间件, `before` `after` `error` 分别对应action执行前, 执行后及执行错误, `filter` 可以对action进行过滤;
 ```javascript
 // Before exec action
 function preLogger({ type, payload }) {
@@ -405,7 +421,7 @@ function preLogger({ type, payload }) {
 // Action exec fail
 function errorLogger({ type, payload }) {
   console.log(`${type} error: `, payload.message);
-  // 这里如果返回null将截断错误
+  // 这里如果返回null将阶段后续的错误
   return payload;
 }
 
