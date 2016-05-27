@@ -43,9 +43,9 @@ export default createModel({
     },
   },
   autorun: {
-    // this.toJSON can listen all data changed
+    // this.toJS can listen all data changed
     saveToLocalStorage() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJSON()));
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
 });

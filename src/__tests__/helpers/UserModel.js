@@ -24,5 +24,8 @@ export default createModel({
     fetchUserInfo() {
       return api.fetchUserInfo(this.userId);
     },
+    setName(username) {
+      this.username = username;
+    },
   },
 });

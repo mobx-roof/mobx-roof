@@ -214,8 +214,11 @@ describe('mobx-roof', () => {
           this.x ++;
           this.y ++;
         },
-        setPos2() {
-          this.set({ x: this.x + 1, y: this.y + 1 });
+        async setPos2() {
+          await new Promise((res) => {
+            this.set({ x: this.x + 1, y: this.y + 1 });
+            res();
+          });
         },
       },
       autorun: {

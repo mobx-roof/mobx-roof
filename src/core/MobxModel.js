@@ -1,4 +1,4 @@
-import { extendObservable, toJSON, autorun, transaction, action } from 'mobx';
+import { extendObservable, toJS, autorun, action } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
@@ -56,12 +56,12 @@ export default class MobxModel {
     }
     return this._actionStates[actionName];
   }
-  toJSON(key) {
+  toJS(key) {
     function parse(val) {
       if (val instanceof MobxModel) {
-        return val.toJSON();
+        return val.toJS();
       }
-      val = toJSON(val);
+      val = toJS(val);
       if (Array.isArray(val)) {
         return val.map(item => parse(item));
       } else if (isRegExp(val)) {
@@ -77,8 +77,11 @@ export default class MobxModel {
       return json;
     }, {});
   }
+  toJSON(key) {
+    return this.toJS(key);
+  }
   stringify() {
-    return JSON.stringify(this.toJSON());
+    return JSON.stringify(this.toJS());
   }
   each(fn) {
     this._dataKeys.map((key) => {
@@ -100,10 +103,11 @@ export default class MobxModel {
       this[key] = val;
       return this;
     }
-    transaction(() => {
-      mapValues(key, item => item, this);
-    });
+    mapValues(key, item => item, this);
     return this;
+  }
+  @action _setActionState(actionName, val) {
+    this._actionStates[actionName] = val;
   }
 }
 
@@ -114,16 +118,16 @@ export function toMobxActions(actions) {
       // Ensure actionState
       this.getActionState(actionName);
       // 1. add loading state and save the pre error
-      this._actionStates[actionName] = { loading: true, error: this._actionStates[actionName].error };
+      this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
       return this._middleware.execAction({ actionFn: action(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success
-          this._actionStates[actionName] = { loading: false, error: null };
+          this._setActionState(actionName, { loading: false, error: null });
           return payload;
         }).catch((error) => {
           // 4. loaded error
-          this._actionStates[actionName] = { loading: false, error };
+          this._setActionState(actionName, { loading: false, error });
           throw error;
         });
     };

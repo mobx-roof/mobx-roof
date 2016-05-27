@@ -257,9 +257,9 @@ export default createModel({
     },
   },
   autorun: {
-    // 自动保存到localStorage, 这里通过`toJSON`会让该方法监听所有的数据变化
+    // 自动保存到localStorage, `toJS` 会获取该model的所有数据
     saveToLocalStorage() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJSON()));
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
 });

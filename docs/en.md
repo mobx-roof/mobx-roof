@@ -251,9 +251,9 @@ export default createModel({
     },
   },
   autorun: {
-    // Auto save data to localStorage, `toJSON` can trigger this function if any data changed.
+    // Auto save data to localStorage, `toJS` can get all data in this model
     saveToLocalStorage() {
-      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJSON()));
+      localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
 });

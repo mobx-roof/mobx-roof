@@ -122,7 +122,7 @@ describe('MobRelation', () => {
       }
     });
     setTimeout(() => {
-      context.find('user').username = 'abc';
+      context.find('user').setName('abc');
     }, 5);
   });
 });
