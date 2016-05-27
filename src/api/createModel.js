@@ -13,6 +13,7 @@ export default function createModel({ name, data = {}, constants = {}, actions =
   class MobxModel extends Parent {
     static uuid = ++ uuid
     static actions = actions
+    static autorun = autorun
     constructor(_initData = {}, middleware, _autorun = {}, _constants) {
       const _data = typeof data === 'function' ? data(_initData) : { ...data, ..._initData };
       super(_data, middleware, { ...autorun, ..._autorun }, { ...constants, ..._constants });
