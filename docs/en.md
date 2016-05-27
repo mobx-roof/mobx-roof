@@ -12,8 +12,6 @@ You can see this example in the `example` folder.
 
 ### 1.Create Model
 
-我们先通过`createModel`创建一个用户登录数据模型:
-
 - `name`: define class name capitalized.
 - `data`: data can be declare as `Object` or `Function`, function returns will transfer to mobx `observable data`, function first param as Model init data. 
 - `actions`: define actions to change `observer data`, action return a `Promise`
