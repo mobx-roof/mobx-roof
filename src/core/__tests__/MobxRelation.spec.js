@@ -8,10 +8,12 @@ describe('MobRelation', () => {
   let context;
   beforeEach(() => {
     relation = new MobxRelation({
-      preFilter: val => val,
-      afterFilter: val => val,
-      getUsername(res) {
-        return res && res.username;
+      filters: {
+        preFilter: val => val,
+        afterFilter: val => val,
+        getUsername(res) {
+          return res && res.username;
+        },
       },
     });
     context = new MobxContext({
@@ -47,6 +49,10 @@ describe('MobRelation', () => {
   it('undefined filter', () => {
     expect(() => relation.parsePattern('user.login | undefinedFilter')).to.throw('Undefined filter');
   });
+  it('listen type check', () => {
+    expect(() => relation.listen()).to.throw(/String or RegExp/);
+    expect(() => relation.listen(3)).to.throw(/String or RegExp/);
+  });
   it('listen empty should throw error', () => {
     expect(() => relation.listen('')).to.throw(/empty/);
     expect(() => relation.listen(`
@@ -57,7 +63,7 @@ describe('MobRelation', () => {
     expect(relation.listen(`
       # This is comment
       user.login
-    `)._relations['user.login'][0].pattern).to.eql({
+    `)._relations[0].pattern).to.eql({
       action: 'user.login',
       refs: ['user'],
       chain: [
@@ -66,7 +72,7 @@ describe('MobRelation', () => {
     });
   });
   it('listen more', () => {
-    expect(Object.keys(relation.listen(`user.login;user.getInfo;`)._relations)).to.eql(['user.login', 'user.getInfo']);
+    expect(relation.listen(`user.login;user.getInfo;`)._relations.map(item => item.pattern.action)).to.eql(['user.login', 'user.getInfo']);
   });
   it('undefined action', async(done) => {
     relation.listen(`user.login->user.unKnownAction|afterFilter`, null, ({ payload }) => {
@@ -85,6 +91,18 @@ describe('MobRelation', () => {
   it('listen and exec error', async(done) => {
     const error = new Error('define error');
     relation.listen(`user.login`, () => {
+      return new Promise((res, rej) => {
+        rej(error);
+      });
+    }, ({ payload }) => {
+      expect(payload).to.eql(error);
+      done();
+    });
+    await context.find('user').login('Lili', '123');
+  });
+  it('liten with pattern', async(done) => {
+    const error = new Error('define error');
+    relation.listen(/user/, () => {
       return new Promise((res, rej) => {
         rej(error);
       });

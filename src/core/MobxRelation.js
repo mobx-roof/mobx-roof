@@ -1,4 +1,4 @@
-import { compose } from '../common/utils';
+import { compose, isRegExp } from '../common/utils';
 import { autorun } from 'mobx';
 const emptyFn = () => {};
 
@@ -26,14 +26,14 @@ function checkFilters(filters) {
  * regexp support
  */
 export default class MobxRelation {
-  constructor(filters = {}) {
-    this._relations = {};
+  constructor(opts = {}) {
+    this._relations = [];
     this._filters = {};
     this._init = null;
     this._autoruns = [];
-    this.addFilters(filters);
+    this.addFilters(opts.filters);
   }
-  addFilters(filters) {
+  addFilters(filters = {}) {
     checkFilters(filters);
     this._filters = { ...this._filters, ...filters };
   }
@@ -72,48 +72,51 @@ export default class MobxRelation {
         throw new Error('[MobxRelation] Relation pattern can not be empty.');
       }
       patterns.forEach(pattern => this._addRelation(pattern, fn, errorFn));
+    } else if (isRegExp(patterns)) {
+      this._addRelation(patterns, fn, errorFn);
     } else {
-      // todo add regExp
+      throw new Error('[MobxRelation] Listen pattern must be a String or RegExp.');
     }
     return this;
   }
   execInMiddleware({ fullname, payload, context }) {
-    let relations;
-    if (relations = this._relations[fullname]) {
-      relations.forEach(({ pattern, fn, errorFn }) => {
-        try {
-          let chain = [];
-          pattern.chain.forEach((item, index) => {
-            chain = chain.concat(item);
-            if (pattern.chain.length - 1 !== index) {
-              chain.push(emptyFn);
-            }
-          });
-          chain = chain.map((key) => {
-            if (typeof key === 'string') {
-              if (isActionKey(key)) {
-                const [name, action] = key.split('.');
-                const model = context.find(name);
-                if (model[action]) {
-                  return model[action].bind(model);
-                }
-                throw new Error(`[MobxRelation] Action "${key}" is not defined.`);
+    this._relations.forEach(({ pattern, fn, errorFn }) => {
+      let chain = [];
+      if ((!isRegExp(pattern.action) && fullname !== pattern.action) || (isRegExp(pattern.action) && !pattern.action.test(fullname))) return;
+      try {
+        pattern.chain.forEach((item, index) => {
+          chain = chain.concat(item);
+          if (pattern.chain.length - 1 !== index) {
+            chain.push(emptyFn);
+          }
+        });
+        chain = chain.map((key) => {
+          if (typeof key === 'string') {
+            if (isActionKey(key)) {
+              const [name, action] = key.split('.');
+              const model = context.find(name);
+              if (model[action]) {
+                return model[action].bind(model);
               }
-              return this._filters[key];
+              throw new Error(`[MobxRelation] Action "${key}" is not defined.`);
             }
-            return key;
-          });
-          compose(chain, payload)
-            .then(res => fn({ context, payload: res }))
-            .catch(e => errorFn({ context, payload: e }));
-        } catch (e) {
-          errorFn({ context, payload: e });
-        }
-      });
-    }
+            return this._filters[key];
+          }
+          return key;
+        });
+        compose(chain, payload)
+          .then(res => fn({ context, payload: res }))
+          .catch(e => errorFn({ context, payload: e }));
+      } catch (e) {
+        errorFn({ context, payload: e });
+      }
+    });
   }
 
   parsePattern(pattern) {
+    if (isRegExp(pattern)) {
+      return { action: pattern, refs: [], chain: [] };
+    }
     pattern = pattern.replace(/\s*/g, '');
     if (!pattern) {
       throw new Error(`[MobxRelation] Relation pattern can not be empty.`);
@@ -145,11 +148,7 @@ export default class MobxRelation {
 
   _addRelation(pattern, fn, errorFn) {
     pattern = this.parsePattern(pattern);
-    const action = pattern.action;
-    if (!this._relations[action]) {
-      this._relations[action] = [];
-    }
-    this._relations[action].push({
+    this._relations.push({
       pattern,
       fn: fn || emptyFn,
       errorFn: errorFn || function ({ payload }) { throw payload; },
