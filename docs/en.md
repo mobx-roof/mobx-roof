@@ -147,7 +147,7 @@ export default class App extends Component {
 ```
 ### 4.Split the react component by `@observer`
 
-`@observer` can subsribe data from the parent context.
+`@observer` can subsribe data from the parent context. Parameter can be a `String`, `Array of String` or `Object` of Model class.
 
 ```javascript
 // example/App
