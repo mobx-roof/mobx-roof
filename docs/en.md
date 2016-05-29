@@ -14,6 +14,7 @@ You can see this example in the `example` folder.
 
 - `name`: define class name capitalized.
 - `data`: data can be declare as `Object` or `Function`, function returns will transfer to mobx `observable data`, function first param as Model init data. 
+- `constants`: an `Object` of read only data,
 - `actions`: define actions to change `observer data`, action return a `Promise`
 - `autorun`: can run any function automatically.
 
@@ -24,10 +25,15 @@ const STORE_KEY = 'mobx-roof';
 
 export default createModel({
   name: 'User',
+  constants: {
+    type: 'USER',
+  },
   data(initData) {
     // Init data from localStorage
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
+    // constants ignore
+    delete data.type;
     return {
       isLogin: false,
       userId: null,

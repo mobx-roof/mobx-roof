@@ -4,10 +4,16 @@ const STORE_KEY = 'mobx-roof';
 
 export default createModel({
   name: 'User',
+  constants: {
+    // read only
+    type: 'USER',
+  },
   data() {
     // InitData from localStorage
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
+    // constants ignore
+    delete data.type;
     return {
       isLogin: false,
       password: null,
