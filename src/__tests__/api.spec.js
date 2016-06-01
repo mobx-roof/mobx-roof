@@ -100,9 +100,11 @@ describe('mobx-roof', () => {
   });
   it('api.extendModel by data function', () => {
     let count = 0;
+    let thisInData;
     const Panel = createModel({
       name: 'Panel',
       data(initData) {
+        thisInData = this;
         return {
           tabName: '',
           id: count++,
@@ -121,6 +123,7 @@ describe('mobx-roof', () => {
       },
     });
     const panel = new PagePanel;
+    expect(panel).to.eql(thisInData);
     expect(panel.toJSON()).to.eql({
       tabName: 'page',
       content: 'abc',

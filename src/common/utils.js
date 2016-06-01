@@ -64,7 +64,34 @@ export function compose(arr, arg) {
     return cur.then(res => fn(res));
   }, Promise.resolve(arg));
 }
-
 export function nameToUpperCase(name = '') {
   return name[0].toUpperCase() + name.slice(1);
+}
+export function inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true,
+    },
+  });
+  if (superClass) {
+    if (Object.setPrototypeOf) Object.setPrototypeOf(subClass, superClass);
+    else subClass.__proto__ = superClass;
+  }
+}
+export function classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
+export function possibleConstructorReturn(self, call) {
+  if (!self) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return call && (typeof call === 'object' || typeof call === 'function') ? call : self;
 }
