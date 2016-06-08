@@ -9,7 +9,7 @@ import { CONTEXT_NAME } from '../common/constants';
 export default function createObserver(mobxModels = {}) {
   let modelKeys;
   if (typeof mobxModels === 'string') {
-    mobxModels = [mobxModels];
+    mobxModels = [...arguments];
   }
   if (Array.isArray(mobxModels)) {
     modelKeys = mobxModels;
