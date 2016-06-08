@@ -256,4 +256,45 @@ describe('mobx-roof', () => {
     await pos.setPos2();
     expect(times).to.eql(3);
   });
+  it('mobx action throw error', async () => {
+    let times = 0;
+    const error = new Error;
+    const Pos = createModel({
+      name: 'Pos',
+      data: {
+        x: 1,
+        y: 2,
+      },
+      actions: {
+        setPos() {
+          this.x ++;
+          this.y ++;
+          if (times === 0) {
+            throw error;
+          }
+        },
+        async setPos2() {
+          await new Promise((res, rej) => {
+            this.set({ x: this.x + 1, y: this.y + 1 });
+            rej(error);
+          });
+        },
+      },
+      autorun: {
+        run() {
+          times ++;
+          return this.toJSON();
+        },
+      },
+    });
+    const pos = new Pos;
+    try {
+      await pos.setPos();
+    } catch (e) { expect(e).to.eql(error); }
+    try {
+      await pos.setPos2();
+    } catch (e) { expect(e).to.eql(error); }
+    await pos.setPos();
+    expect(times).to.eql(4);
+  });
 });

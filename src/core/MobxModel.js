@@ -1,7 +1,14 @@
-import { extendObservable, toJS, autorun, action } from 'mobx';
+import { extendObservable, toJS, autorun, transaction } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import MobxMiddleware from './MobxMiddleware';
 let count = 0;
+function actionWrap(fn) {
+  return function _actionWrap() {
+    let result;
+    transaction(() => result = fn.apply(this, arguments));
+    return result;
+  };
+}
 
 export default class MobxModel {
   static uuid = 0
@@ -98,15 +105,15 @@ export default class MobxModel {
       }
     });
   }
-  @action set(key, val) {
+  set(key, val) {
     if (typeof key === 'string') {
       this[key] = val;
       return this;
     }
-    mapValues(key, item => item, this);
+    transaction(() => mapValues(key, item => item, this));
     return this;
   }
-  @action _setActionState(actionName, val) {
+  _setActionState(actionName, val) {
     this._actionStates[actionName] = val;
   }
 }
@@ -121,7 +128,7 @@ export function toMobxActions(actions) {
       this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
       // todo: mobx.action can not support in async/await function
-      return this._middleware.execAction({ actionFn: action(actionFn), actionName, actionArgs, actionContext })
+      return this._middleware.execAction({ actionFn: actionWrap(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success
           this._setActionState(actionName, { loading: false, error: null });
