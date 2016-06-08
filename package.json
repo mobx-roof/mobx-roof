@@ -25,7 +25,7 @@
   "author": "xiamidaxia@icloud.com",
   "license": "ISC",
   "dependencies": {
-    "mobx": "^2.2.1",
+    "mobx": "^2.2.2",
     "mobx-react": "^3.3.0"
   },
   "devDependencies": {
