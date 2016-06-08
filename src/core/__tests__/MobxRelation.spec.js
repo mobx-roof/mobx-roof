@@ -121,9 +121,15 @@ describe('MobRelation', () => {
   });
   it('relation init', (done) => {
     expect(() => relation.init()).to.throw(/need a function/);
+    let count = 0;
     relation.init((ctx) => {
       // data loaded
+      count ++;
       expect(Object.keys(ctx).length).to.eql(2);
+    });
+    relation.init(() => {
+      count ++;
+      expect(count).to.eql(2);
       done();
     });
   });

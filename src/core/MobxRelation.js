@@ -29,7 +29,7 @@ export default class MobxRelation {
   constructor(opts = {}) {
     this._relations = [];
     this._filters = {};
-    this._init = null;
+    this._inits = [];
     this._autoruns = [];
     this.addFilters(opts.filters);
   }
@@ -39,7 +39,7 @@ export default class MobxRelation {
   }
   init(initFn) {
     if (typeof initFn === 'function') {
-      this._init = initFn;
+      this._inits.push(initFn);
     } else {
       throw new Error('[MobxRelation] Relation init need a function.');
     }
@@ -57,7 +57,7 @@ export default class MobxRelation {
     });
   }
   triggerInit(context) {
-    if (this._init) this._init(context.data);
+    this._inits.forEach(fn => fn(context.data));
   }
   listen(patterns, fn, errorFn) {
     if (typeof patterns === 'string') {
