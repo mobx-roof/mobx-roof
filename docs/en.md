@@ -159,10 +159,11 @@ import React, { Component, PropTypes } from 'react';
 import { context, observer } from 'mobx-roof';
 import UserModel from './models/User';
 
-@observer('user')
+@observer('user', 'todos')
 class UserLogin extends Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
+    todos: PropTypes.object.isRequired,
   }
   login() {
     this.props.user.login(this.refs.username.value, this.refs.password.value);
@@ -187,10 +188,11 @@ class UserLogin extends Component {
 }
 
 // It should throw Error if user is not instance of UserModel
-@observer({ user: UserModel })
+@observer({ user: UserModel, todos: TodosModel })
 class UserDetail extends Component {
   static propTypes = {
     user: PropTypes.object.isRequired,
+    todos: PropTypes.object.isRequired,
   }
   logout() {
     this.props.user.logout();
@@ -205,10 +207,11 @@ class UserDetail extends Component {
   }
 }
 
-@context({ user: UserModel })
+@context({ user: UserModel, todos: TodosModel })
 export default class App extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(UserModel).isRequired,
+    todos: PropTypes.instanceOf(TodosModel).isRequired,
   }
   render() {
     const { user } = this.props;
@@ -379,6 +382,23 @@ relation.autorun((context) => {
   console.log('[autorun] ', context.todos.toJS());
 });
 
+```
+
+- 6.relation.use
+
+`use` can split the relation
+
+```javascript
+function userLoginListen(relation) {
+  relation.init(() => {} );
+  relation.listen('user.login', () => {});
+}
+function autoruns(relation) {
+  relation.init(() => {} );
+  relation.autorun(() => {});
+}
+
+relation.use(listenUserLogin, autoruns);
 ```
 
 ### Middleware

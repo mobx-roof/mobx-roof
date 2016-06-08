@@ -41,8 +41,17 @@ export default class MobxRelation {
     if (typeof initFn === 'function') {
       this._inits.push(initFn);
     } else {
-      throw new Error('[MobxRelation] Relation init need a function.');
+      throw new Error(`[MobxRelation] Relation init need a function but get ${typeof initFn}.`);
     }
+  }
+  use(...args) {
+    args.forEach((fn) => {
+      if (typeof fn === 'function') {
+        fn(this);
+      } else {
+        throw new Error(`[MobxRelation] relation.use need functions but get ${typeof fn}.`);
+      }
+    });
   }
   autorun(autorun) {
     if (typeof autorun === 'function') {

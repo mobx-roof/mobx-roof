@@ -147,4 +147,15 @@ describe('MobRelation', () => {
       context.find('user').setName('abc');
     }, 5);
   });
+  it('relation use', () => {
+    let count = 0;
+    expect(() => relation.use('abc')).to.throw(/relation.use need functions/);
+    relation.use((r) => {
+      expect(r).to.eql(relation);
+      count ++;
+    }, () => {
+      count ++;
+    });
+    expect(count).to.eql(2);
+  });
 });
