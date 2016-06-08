@@ -29,6 +29,9 @@ export default createModel({
   constants: {
     type: 'USER',
   },
+  privates: {
+    _fixName() {},
+  },
   data(initData) {
     // Init data from localStorage
     let data = localStorage.getItem(STORE_KEY);
