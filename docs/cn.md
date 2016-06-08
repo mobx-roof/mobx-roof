@@ -17,8 +17,11 @@ Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框�
 - `name`: 定义类名, 类名首字母大写
 - `data`: 可以通过`对象`声明或者`函数`声明, 函数返回的数据会被转换成mobx的`observable data`, 函数的第一个参数可以当成Model实例化的初始数据
 - `constants`: 静态只读数据
-- `actions`: 定义模型的方法, 可以使用`async/await`处理异步方法, 方法返回值会转换成`Promise`, 其中对象提供了`set`方法可以快速修改多个数据, 而`toJS` 方法可以将数据转换成JSON格式
+- `privates`: 私有方法
+- `actions`: 定义模型的action, action是对外开放的接口, 可以使用`async/await`处理异步action, action返回值会转换成`Promise`
 - `autorun`: 可以在所依赖数据变动时候自动运行定义的函数, 下边例子当User数据发生变化时候会自动保存到localStorage
+
+数据模型还提供了`set`方法可以快速修改多个数据, 而`toJS` 方法可以将数据转换成JSON格式
 
 ```javascript
 import { createModel } from 'mobx-roof';
@@ -29,6 +32,9 @@ export default createModel({
   name: 'User',
   constants: {
     type: 'USER',
+  },
+  privates: {
+    _fixName() {},
   },
   data(initData) {
     // 从localStorage初始化数据

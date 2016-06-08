@@ -69,7 +69,7 @@ describe('mobx-roof', () => {
         },
       },
     });
-    expect(() => new User).to.throw(/is defined in action/);
+    expect(() => new User).to.throw(/is defined/);
   });
   it('api.extendModel', () => {
     const ChineseUser = extendModel(User, {
@@ -158,7 +158,7 @@ describe('mobx-roof', () => {
     expect(user.from).to.eql('China');
     expect(user.toJSON()).to.eql({ from: 'China' });
     expect(() => user.from = 'USA').to.throw(/read only/);
-    expect(() => new User2Model()).to.throw(/defined in actions/);
+    expect(() => new User2Model()).to.throw(/defined in/);
   });
   it('api.createModel constants conflicted', () => {
     const UserModel = createModel({
@@ -199,6 +199,26 @@ describe('mobx-roof', () => {
       from: 'India',
       isChild: true,
     });
+  });
+  it('api.createModel privates', () => {
+    const privateFn1 = () => {};
+    const privateFn2 = () => {};
+    const UserModel = createModel({
+      name: 'User',
+      privates: {
+        _fn: privateFn1,
+      },
+    });
+    const USAModel = extendModel(UserModel, {
+      name: 'USAUser',
+      privates: {
+        _fn: privateFn2,
+      },
+    });
+    const user = new UserModel;
+    const user2 = new USAModel;
+    expect(user._fn).to.eql(privateFn1);
+    expect(user2._fn).to.eql(privateFn2);
   });
   it('api.createContext', () => {
     const output = renderContext();

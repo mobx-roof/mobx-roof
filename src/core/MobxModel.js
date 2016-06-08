@@ -94,7 +94,7 @@ export default class MobxModel {
   _checkDataKeys() {
     this._dataKeys.forEach((dataKey) => {
       if (this[dataKey]) {
-        throw new Error(`[MobxModel] Data key "${dataKey}" is defined in actions.`);
+        throw new Error(`[MobxModel] Data key "${dataKey}" is defined in prototype methods.`);
       }
     });
   }

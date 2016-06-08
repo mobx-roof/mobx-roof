@@ -15,6 +15,7 @@ You can see this example in the `example` folder.
 - `name`: define class name capitalized.
 - `data`: data can be declare as `Object` or `Function`, function returns will transfer to mobx `observable data`, function first param as Model init data. 
 - `constants`: an `Object` of read only data,
+- `privates`: private methods
 - `actions`: define actions to change `observer data`, action return a `Promise`
 - `autorun`: can run any function automatically.
 
