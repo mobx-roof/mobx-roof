@@ -43,12 +43,15 @@ export default class MobxModel {
     Object.defineProperties(this, _constants);
     extendObservable(this, toObservableObj(initData));
     // exec init before autorun
-    if (this.init) {
-      transaction(() => this.init(initData));
-    }
+    transaction(() => this.init(initData));
     // add auto run key
     each(autorunMap, (autorunFn) => {
       autorun(autorunFn, this);
+    });
+  }
+  init(initData) {
+    this.set({
+      ...initData,
     });
   }
   getID() {

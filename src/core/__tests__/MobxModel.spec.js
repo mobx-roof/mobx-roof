@@ -25,7 +25,6 @@ describe('MobxModel', () => {
       users: [user, user],
       reg: /reg/,
       num: 1,
-      func: () => {},
       mobxVal: observable({ observable: true }),
       nest: {
         nest: {
@@ -39,7 +38,6 @@ describe('MobxModel', () => {
       users: [userJSON, userJSON],
       reg: /reg/,
       num: 1,
-      func: undefined,
       mobxVal: { observable: true },
       nest: { nest: { user: userJSON } },
     };
