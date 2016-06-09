@@ -3,14 +3,12 @@ import * as api from './api';
 
 export default createModel({
   name: 'User',
-  data(data) {
-    return Object.assign({
-      isLogin: false,
-      password: null,
-      username: null,
-      userId: null,
-      userInfo: {},
-    }, data);
+  data: {
+    isLogin: false,
+    password: null,
+    username: null,
+    userId: null,
+    userInfo: {},
   },
   actions: {
     async login(username, password) {

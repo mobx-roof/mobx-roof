@@ -21,6 +21,10 @@ relation.init((context) => {
 
 relation.listen('user.login', ({ context, payload }) => {
   console.log('[relation] user.login: ', payload, context);
+  const { user } = context;
+  if (user.isLogin) {
+    user.fetchUserInfo();
+  }
 });
 
 relation.listen(/^user/, ({ action }) => {
@@ -33,7 +37,6 @@ relation.listen('user.login; user.fetchUserInfo', ({ action }) => {
 
 relation.listen(`
   ## comment
-  user.login -> user.fetchUserInfo;
   user.login | filter1 => filter2 | todos.getByUserId
 `);
 

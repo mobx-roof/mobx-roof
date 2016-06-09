@@ -4,10 +4,8 @@ import * as api from '../api';
 
 export default createModel({
   name: 'Todos',
-  data() {
-    return {
-      list: [],
-    };
+  data: {
+    list: [],
   },
   actions: {
     add(text, userId) {

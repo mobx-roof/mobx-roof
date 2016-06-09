@@ -8,22 +8,24 @@ export default createModel({
     // read only
     type: 'USER',
   },
-  data() {
+  data: {
+    isLogin: false,
+    password: null,
+    username: null,
+    userId: null,
+    loginError: '',
+    habits: [],
+    from: null,
+  },
+  init() {
     // InitData from localStorage
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
     // constants ignore
     delete data.type;
-    return {
-      isLogin: false,
-      password: null,
-      username: null,
-      userId: null,
-      loginError: '',
-      habits: [],
-      from: null,
+    this.set({
       ...data,
-    };
+    });
   },
   actions: {
     async login(username, password) {

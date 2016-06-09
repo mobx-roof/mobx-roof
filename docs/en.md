@@ -13,11 +13,12 @@ You can see this example in the `example` folder.
 ### 1.Create Model
 
 - `name`: define class name capitalized.
-- `data`: data can be declare as `Object` or `Function`, function returns will transfer to mobx `observable data`, function first param as Model init data. 
-- `constants`: an `Object` of read only data,
-- `privates`: private methods
-- `actions`: define actions to change `observer data`, action return a `Promise`
+- `data`: data must be declare as `Object`, it will transfer to mobx `observable data`.
+- `constants`: an `Object` of read only data.
+- `init`: exec after `data` and `constants` , ther fist param is from `data` returns.
+- `actions`: define actions to change `observer data`, action return a `Promise`.
 - `autorun`: can run any function automatically.
+- Other any custom methods.
 
 ```javascript
 import { createModel } from 'mobx-roof';
@@ -29,23 +30,25 @@ export default createModel({
   constants: {
     type: 'USER',
   },
-  privates: {
-    _fixName() {},
+  data: {
+    isLogin: false,
+    password: null,
+    username: null,
+    userId: null,
+    loginError: '',
+    habits: [],
+    from: null,
   },
-  data(initData) {
-    // Init data from localStorage
+  init(initData) {
+    // InitData from localStorage
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
     // constants ignore
     delete data.type;
-    return {
-      isLogin: false,
-      userId: null,
-      loginError: '',
-      // ...
+    this.set({
       ...data,
-    };
-  },
+    });
+  }
   actions: {
     async login(username, password) {
       const res = await api.login(username, password);
@@ -68,6 +71,9 @@ export default createModel({
       localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
+  // Any custom method
+  customMethod() {
+  }
 });
 
 ```
@@ -258,14 +264,17 @@ import * as api from '../api';
 
 const TodoItem = createModel({
   name: 'TodoItem',
-  data({ text, userId, completed, id }) {
-    return {
-      text,
-      userId,
-      completed,
-      id,
-    };
-  }
+  data: {
+    text: '',
+    userId: null,
+    completed: false,
+    id: null,
+  },
+  init(initData) {
+    this.set({
+      ...initData,
+    });
+  },
 });
 
 export default createModel({

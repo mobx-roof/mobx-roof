@@ -98,38 +98,6 @@ describe('mobx-roof', () => {
     });
     expect(user.rename).to.instanceOf(Function);
   });
-  it('api.extendModel by data function', () => {
-    let count = 0;
-    let thisInData;
-    const Panel = createModel({
-      name: 'Panel',
-      data(initData) {
-        thisInData = this;
-        return {
-          tabName: '',
-          id: count++,
-          ...initData,
-        };
-      },
-    });
-    const PagePanel = extendModel(Panel, {
-      name: 'PagePanel',
-      data(initData) {
-        return {
-          tabName: 'page',
-          content: 'abc',
-          ...initData,
-        };
-      },
-    });
-    const panel = new PagePanel;
-    expect(panel).to.eql(thisInData);
-    expect(panel.toJSON()).to.eql({
-      tabName: 'page',
-      content: 'abc',
-      id: 0,
-    });
-  });
   it('name check and name to Uppercase', () => {
     const User = createModel({
       name: 'user',
@@ -205,20 +173,47 @@ describe('mobx-roof', () => {
     const privateFn2 = () => {};
     const UserModel = createModel({
       name: 'User',
-      privates: {
-        _fn: privateFn1,
-      },
+      _fn: privateFn1,
     });
     const USAModel = extendModel(UserModel, {
       name: 'USAUser',
-      privates: {
-        _fn: privateFn2,
-      },
+      _fn: privateFn2,
     });
     const user = new UserModel;
     const user2 = new USAModel;
     expect(user._fn).to.eql(privateFn1);
     expect(user2._fn).to.eql(privateFn2);
+  });
+  it('api.createModel init', () => {
+    let runTimes = 0;
+    const UserModel = createModel({
+      name: 'User',
+      data: {
+        name: 'name',
+      },
+      init(initData) {
+        runTimes ++;
+        expect(initData.name).to.eql('name');
+        expect(this.name).to.eql('name');
+      },
+    });
+    const USAModel = extendModel(UserModel, {
+      name: 'USAUser',
+      data: {
+        name: 'name2',
+        from: 'USA',
+      },
+      init(initData) {
+        runTimes ++;
+        expect(initData.name).to.eql('name2');
+        expect(initData.from).to.eql('USA');
+        expect(this.name).to.eql('name2');
+      },
+    });
+    const user1 = new UserModel;
+    const user2 = new USAModel;
+    expect(runTimes).to.eql(2);
+    return [user1, user2];
   });
   it('api.createContext', () => {
     const output = renderContext();

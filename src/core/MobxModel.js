@@ -42,6 +42,10 @@ export default class MobxModel {
     // add observable keys
     Object.defineProperties(this, _constants);
     extendObservable(this, toObservableObj(initData));
+    // exec init before autorun
+    if (this.init) {
+      transaction(() => this.init(initData));
+    }
     // add auto run key
     each(autorunMap, (autorunFn) => {
       autorun(autorunFn, this);
@@ -127,7 +131,6 @@ export function toMobxActions(actions) {
       // 1. add loading state and save the pre error
       this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
-      // todo: mobx.action can not support in async/await function
       return this._middleware.execAction({ actionFn: actionWrap(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success

@@ -2,13 +2,16 @@ import { createModel } from '../../src';
 
 export default createModel({
   name: 'TodoItem',
-  data({ text, userId, completed, id }) {
-    return {
-      text,
-      userId,
-      completed,
-      id,
-    };
+  data: {
+    text: '',
+    userId: null,
+    completed: false,
+    id: null,
+  },
+  init(initData) {
+    this.set({
+      ...initData,
+    });
   },
   actions: {
     update(text, userId, completed) {

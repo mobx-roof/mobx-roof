@@ -15,11 +15,12 @@ Mobx-Roof是基于[mobx](https://github.com/mobxjs/mobx)的简单React MVVM框�
 我们先通过`createModel`创建一个用户登录数据模型:
 
 - `name`: 定义类名, 类名首字母大写
-- `data`: 可以通过`对象`声明或者`函数`声明, 函数返回的数据会被转换成mobx的`observable data`, 函数的第一个参数可以当成Model实例化的初始数据
+- `data`: 通过`对象`声明, 并被转换为`observable data`.
 - `constants`: 静态只读数据
-- `privates`: 私有方法
+- `init`: `data` 和 `constants` 初始化之后执行, 第一个参数为`data`返回数据
 - `actions`: 定义模型的action, action是对外开放的接口, 可以使用`async/await`处理异步action, action返回值会转换成`Promise`
 - `autorun`: 可以在所依赖数据变动时候自动运行定义的函数, 下边例子当User数据发生变化时候会自动保存到localStorage
+- 除了以上几个其他的都可以自定义
 
 数据模型还提供了`set`方法可以快速修改多个数据, 而`toJS` 方法可以将数据转换成JSON格式
 
@@ -33,23 +34,25 @@ export default createModel({
   constants: {
     type: 'USER',
   },
-  privates: {
-    _fixName() {},
+  data: {
+    isLogin: false,
+    password: null,
+    username: null,
+    userId: null,
+    loginError: '',
+    habits: [],
+    from: null,
   },
-  data(initData) {
-    // 从localStorage初始化数据
+  init(initData) {
+    // InitData from localStorage
     let data = localStorage.getItem(STORE_KEY);
     data = data ? JSON.parse(data) : {};
     // constants ignore
     delete data.type;
-    return {
-      isLogin: false,
-      userId: null,
-      loginError: '',
-      // ...
+    this.set({
       ...data,
-    };
-  },
+    });
+  }
   actions: {
     async login(username, password) {
       const res = await api.login(username, password);
@@ -71,6 +74,9 @@ export default createModel({
       localStorage.setItem(STORE_KEY, JSON.stringify(this.toJS()));
     },
   },
+  // 其他的都是自定义方法
+  customMethod() {
+  }
 });
 
 ```
@@ -264,14 +270,17 @@ import * as api from '../api';
 
 const TodoItem = createModel({
   name: 'TodoItem',
-  data({ text, userId, completed, id }) {
-    return {
-      text,
-      userId,
-      completed,
-      id,
-    };
-  }
+  data: {
+    text: '',
+    userId: null,
+    completed: false,
+    id: null,
+  },
+  init(initData) {
+    this.set({
+      ...initData,
+    });
+  },
 });
 
 export default createModel({
