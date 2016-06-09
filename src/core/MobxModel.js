@@ -63,6 +63,9 @@ export default class MobxModel {
   set middleware(middleware) {
     this._middleware = middleware;
   }
+  get middleware() {
+    return this._middleware;
+  }
   getActionState(actionName) {
     if (!this[actionName]) throw new Error('[MobxModel] Undefined action: ', actionName);
     if (!this._actionStates[actionName]) {

@@ -292,8 +292,8 @@ export default createModel({
   },
   actions: {
     add(text, userId) {
-      // Add Other model
-      this.list.push(new TodoItem({ text, userId }));
+      // Add sub model with parent's middleware
+      this.list.push(new TodoItem({ text, userId }, this.middleware));
     },
   },
 });

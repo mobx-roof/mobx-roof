@@ -1,6 +1,6 @@
 {
   "name": "mobx-roof",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Simple React data management by mobx.",
   "main": "lib/index.js",
   "scripts": {
