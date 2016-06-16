@@ -464,16 +464,14 @@ export default class App extends Component {
 }
 ```
 
-设定为全局的middleware, context默认会使用全局的middleware
+使用全局的middleware, 这里context默认会使用全局的middleware
 
 ```javascript
-import { Middleware, context } from 'mobx-roof';
+import { globalMiddleware, context } from 'mobx-roof';
 import logger from './logger';
-const middleware = new Middleware;
-middleware.use(
+globalMiddleware.use(
   logger,
 );
-globalMiddleware.set(middleware);
 
 @context({ user: UserModel })
 export default class App extends Component {

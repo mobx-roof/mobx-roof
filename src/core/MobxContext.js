@@ -15,7 +15,7 @@ export default class MobxContext extends SimpleEvent {
    */
   constructor(contextInitData = {}, opts = {}) {
     super();
-    this._middleware = opts.middleware;
+    this._middleware = opts.middleware || globalMiddleware;
     this._relation = opts.relation || new MobxRelation;
     this._data = mapValues(contextInitData, (Model, name) => {
       // Get from parent context
@@ -76,7 +76,7 @@ export default class MobxContext extends SimpleEvent {
     return this._relation;
   }
   get middleware() {
-    return this._middleware || globalMiddleware.get();
+    return this._middleware;
   }
   get data() {
     return this._data;

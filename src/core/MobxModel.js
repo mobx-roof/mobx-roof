@@ -20,7 +20,7 @@ export default class MobxModel {
       throw new Error('[MobxModel] Can not immediately extend from MobxModel.');
     }
     this._actionStates = {};
-    this._middleware = middleware;
+    this._middleware = middleware || globalMiddleware;
     this._id = count ++;
     Object.keys(initData).forEach((key) => {
       if (constants[key] !== undefined) {
@@ -64,7 +64,7 @@ export default class MobxModel {
     this._middleware = middleware;
   }
   get middleware() {
-    return this._middleware || globalMiddleware.get();
+    return this._middleware;
   }
   getActionState(actionName) {
     if (!this[actionName]) throw new Error('[MobxModel] Undefined action: ', actionName);

@@ -6,10 +6,9 @@ import TodosModel from './models/Todos';
 import UserLogin from './components/UserLogin';
 import UserDetail from './components/UserDetail';
 import Todos from './components/Todos';
-import middleware from './middlewares';
 import relation from './relations';
 
-@context({ user: UserModel, todos: TodosModel }, { middleware, relation })
+@context({ user: UserModel, todos: TodosModel }, { relation })
 export default class App extends Component {
   static propTypes = {
     user: PropTypes.instanceOf(UserModel).isRequired,
