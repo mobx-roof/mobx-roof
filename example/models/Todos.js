@@ -9,7 +9,7 @@ export default createModel({
   },
   actions: {
     add(text, userId) {
-      this.list.push(new TodoItem({ text, userId }, this.middleware));
+      this.list.push(new TodoItem({ text, userId }));
     },
     async getByUserId(userId) {
       let todos = await api.getTodosByUserId(userId);

@@ -1,6 +1,6 @@
 import { extendObservable, toJS, autorun, transaction } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
-import MobxMiddleware from './MobxMiddleware';
+import globalMiddleware from './globalMiddleware';
 let count = 0;
 function actionWrap(fn) {
   return function _actionWrap() {
@@ -20,7 +20,7 @@ export default class MobxModel {
       throw new Error('[MobxModel] Can not immediately extend from MobxModel.');
     }
     this._actionStates = {};
-    this._middleware = middleware || new MobxMiddleware;
+    this._middleware = middleware;
     this._id = count ++;
     Object.keys(initData).forEach((key) => {
       if (constants[key] !== undefined) {
@@ -64,7 +64,7 @@ export default class MobxModel {
     this._middleware = middleware;
   }
   get middleware() {
-    return this._middleware;
+    return this._middleware || globalMiddleware.get();
   }
   getActionState(actionName) {
     if (!this[actionName]) throw new Error('[MobxModel] Undefined action: ', actionName);
@@ -137,7 +137,7 @@ export function toMobxActions(actions) {
       // 1. add loading state and save the pre error
       this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
-      return this._middleware.execAction({ actionFn: actionWrap(actionFn), actionName, actionArgs, actionContext })
+      return this.middleware.execAction({ actionFn: actionWrap(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success
           this._setActionState(actionName, { loading: false, error: null });

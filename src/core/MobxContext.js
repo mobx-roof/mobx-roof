@@ -1,6 +1,6 @@
 import { each, mapValues } from '../common/utils';
 import MobxModel, { isMobxModelClass } from './MobxModel';
-import MobxMiddleware from './MobxMiddleware';
+import globalMiddleware from './globalMiddleware';
 import MobxRelation from './MobxRelation';
 import SimpleEvent from '../common/SimpleEvent';
 
@@ -15,7 +15,7 @@ export default class MobxContext extends SimpleEvent {
    */
   constructor(contextInitData = {}, opts = {}) {
     super();
-    this._middleware = opts.middleware || new MobxMiddleware;
+    this._middleware = opts.middleware;
     this._relation = opts.relation || new MobxRelation;
     this._data = mapValues(contextInitData, (Model, name) => {
       // Get from parent context
@@ -65,7 +65,7 @@ export default class MobxContext extends SimpleEvent {
       });
       return arg.payload;
     };
-    this._relationRemove = this._middleware.use({
+    this._relationRemove = this.middleware.use({
       after: hook,
     });
   }
@@ -76,7 +76,7 @@ export default class MobxContext extends SimpleEvent {
     return this._relation;
   }
   get middleware() {
-    return this._middleware;
+    return this._middleware || globalMiddleware.get();
   }
   get data() {
     return this._data;

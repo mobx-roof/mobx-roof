@@ -459,3 +459,20 @@ export default class App extends Component {
   //...
 }
 ```
+
+Set as global middleware, It will be as default middleware.
+
+```javascript
+import { Middleware, context } from 'mobx-roof';
+import logger from './logger';
+const middleware = new Middleware;
+middleware.use(
+  logger,
+);
+globalMiddleware.set(middleware);
+
+@context({ user: UserModel })
+export default class App extends Component {
+  //...
+}
+```

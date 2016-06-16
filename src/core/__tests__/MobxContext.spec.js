@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import MobxContext from '../MobxContext';
+import MobxMiddleware from '../MobxMiddleware';
 import UserModel from '../../__tests__/helpers/UserModel';
 import TodoModel from '../../__tests__/helpers/TodoModel';
 describe('MobContext', () => {
@@ -8,7 +9,7 @@ describe('MobContext', () => {
     context = new MobxContext({
       user: UserModel,
       todo: new TodoModel,
-    });
+    }, { middleware: new MobxMiddleware });
   });
   it('create', () => {
     expect(context.data.user).to.instanceOf(UserModel);
