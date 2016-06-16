@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { context } from '../src';
 import UserModel from './models/User';
 import TodosModel from './models/Todos';
+// load middlewares
+import './middlewares';
 // components
 import UserLogin from './components/UserLogin';
 import UserDetail from './components/UserDetail';
