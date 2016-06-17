@@ -1,14 +1,7 @@
-import { extendObservable, autorun, transaction, toJS, isObservableArray } from 'mobx';
+import { extendObservable, autorun, transaction, toJS, runInAction, action, isObservableArray } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import globalMiddleware from './globalMiddleware';
 let count = 0;
-function actionWrap(fn) {
-  return function _actionWrap() {
-    let result;
-    transaction(() => result = fn.apply(this, arguments));
-    return result;
-  };
-}
 
 export default class MobxModel {
   static uuid = 0
@@ -119,7 +112,7 @@ export default class MobxModel {
       this[key] = val;
       return this;
     }
-    transaction(() => mapValues(key, item => item, this));
+    runInAction(() => mapValues(key, item => item, this));
     return this;
   }
   _setActionState(actionName, val) {
@@ -136,7 +129,7 @@ export function toMobxActions(actions) {
       // 1. add loading state and save the pre error
       this._setActionState(actionName, { loading: true, error: this._actionStates[actionName].error });
       // 2. exec action with hooks
-      return this.middleware.execAction({ actionFn: actionWrap(actionFn), actionName, actionArgs, actionContext })
+      return this.middleware.execAction({ actionFn: action(actionFn), actionName, actionArgs, actionContext })
         .then((payload) => {
           // 3. loaded success
           this._setActionState(actionName, { loading: false, error: null });
