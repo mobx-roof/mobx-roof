@@ -1,4 +1,4 @@
-import { extendObservable, toJS, autorun, transaction } from 'mobx';
+import { extendObservable, autorun, transaction, toJS, isObservableArray } from 'mobx';
 import { mapValues, each, isRegExp, toObservableObj } from '../common/utils';
 import globalMiddleware from './globalMiddleware';
 let count = 0;
@@ -78,15 +78,14 @@ export default class MobxModel {
       if (val instanceof MobxModel) {
         return val.toJS();
       }
-      val = toJS(val);
-      if (Array.isArray(val)) {
+      if (isObservableArray(val)) {
         return val.map(item => parse(item));
       } else if (isRegExp(val)) {
         return val;
       } else if (val && typeof val === 'object') {
         return mapValues(val, (item) => parse(item));
       }
-      return val;
+      return toJS(val);
     }
     if (key) return parse(this[key]);
     return this._dataKeys.reduce((json, key) => {

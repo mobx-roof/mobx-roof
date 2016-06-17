@@ -1,6 +1,6 @@
 {
   "name": "mobx-roof",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Simple React data management by mobx.",
   "main": "lib/index.js",
   "scripts": {
@@ -25,8 +25,8 @@
   "author": "xiamidaxia@icloud.com",
   "license": "ISC",
   "dependencies": {
-    "mobx": "^2.2.2",
-    "mobx-react": "^3.3.0"
+    "mobx": "~2.3.1",
+    "mobx-react": "~3.3.1"
   },
   "devDependencies": {
     "babel-cli": "^6.7.7",

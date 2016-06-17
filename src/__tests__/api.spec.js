@@ -271,7 +271,7 @@ describe('mobx-roof', () => {
         async setPos2() {
           await new Promise((res, rej) => {
             this.set({ x: this.x + 1, y: this.y + 1 });
-            rej(error);
+            setTimeout(() => rej(error), 5);
           });
         },
       },
