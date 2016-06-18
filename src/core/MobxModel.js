@@ -71,7 +71,7 @@ export default class MobxModel {
       if (val instanceof MobxModel) {
         return val.toJS();
       }
-      if (isObservableArray(val)) {
+      if (Array.isArray(val) || isObservableArray(val)) {
         return val.map(item => parse(item));
       } else if (isRegExp(val)) {
         return val;

@@ -23,11 +23,13 @@ describe('MobxModel', () => {
     // nested MobxModel
     const model = new MobxModel({
       users: [user, user],
+      arr: ['1', { obj: 2 }],
       reg: /reg/,
       num: 1,
       mobxVal: observable({ observable: true }),
       nest: {
         nest: {
+          arr: ['1', { obj: 2 }],
           user,
         },
       },
@@ -36,10 +38,14 @@ describe('MobxModel', () => {
     expect(model.nest.nest.user instanceof MobxModel).to.eql(true);
     const result = {
       users: [userJSON, userJSON],
+      arr: ['1', { obj: 2 }],
       reg: /reg/,
       num: 1,
       mobxVal: { observable: true },
-      nest: { nest: { user: userJSON } },
+      nest: { nest: {
+        arr: ['1', { obj: 2 }],
+        user: userJSON,
+      } },
     };
     expect(model.toJSON()).to.eql(result);
     expect(model.toJSON('users')).to.eql([userJSON, userJSON]);
