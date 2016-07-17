@@ -122,7 +122,7 @@ export default class MobxModel {
 
 export function toMobxActions(actions) {
   return mapValues(actions, (actionFn, actionName) => {
-    return function (...actionArgs) {
+    return function mobxAction(...actionArgs) {
       const actionContext = this;
       // Ensure actionState
       this.getActionState(actionName);
