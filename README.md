@@ -1,3 +1,6 @@
+
+> This project is `Deprecated`, You can use [tangram-react](https://github.com/xiamidaxia/tangram-react) instead.
+
 # Mobx-Roof
 
 Mobx-roof is a simple React MVVM framework based on [mobx](https://github.com/mobxjs/mobx).
